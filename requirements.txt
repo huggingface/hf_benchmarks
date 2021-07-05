@@ -2,3 +2,4 @@ datasets>=1.8
 scikit-learn
 ipywidgets>-7.6.3
 black
+isort
