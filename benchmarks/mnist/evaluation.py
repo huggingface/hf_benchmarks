@@ -1,8 +1,8 @@
+import json
 from collections import defaultdict
 from typing import Dict
 
 from datasets import load_dataset, load_metric
-import json
 
 
 def evaluate(
