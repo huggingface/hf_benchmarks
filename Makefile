@@ -1,0 +1,2 @@
+style:
+	black . && isort .
