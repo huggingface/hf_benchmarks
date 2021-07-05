@@ -2,6 +2,7 @@ from collections import defaultdict
 from typing import Dict
 
 from datasets import load_dataset, load_metric
+import json
 
 
 def evaluate(
@@ -20,3 +21,14 @@ def evaluate(
                 predictions=preds_ds[split]["preds"], references=test_ds[split]["label"]
             )
     return metrics
+
+
+def main():
+    metrics = evaluate()
+
+    with open("metrics.json", "w", encoding="utf-8") as f:
+        json.dump(metrics, f)
+
+
+if __name__ == "__main__":
+    main()
