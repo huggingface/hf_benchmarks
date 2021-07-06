@@ -17,9 +17,17 @@ def evaluate(
     for task in tasks:
         preds_ds = load_dataset(submission_dataset, task, use_auth_token=use_auth_token)
         acc = load_metric("accuracy")
+        f1 = load_metric("f1")
         for split in test_ds.keys():
             metrics[task][split] = acc.compute(
                 predictions=preds_ds[split]["preds"], references=test_ds[split]["label"]
+            )
+            metrics[task][split].update(
+                f1.compute(
+                    predictions=preds_ds[split]["preds"],
+                    references=test_ds[split]["label"],
+                    average="macro",
+                )
             )
     return metrics
 
