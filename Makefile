@@ -1,2 +1,2 @@
 style:
-	black . && isort .
+	black --line-length 119 . && isort .
