@@ -6,10 +6,7 @@ from datasets import load_dataset, load_metric
 
 
 def evaluate(
-    test_dataset: str = "mnist",
-    submission_dataset: str = "lewtun/mnist-preds",
-    use_auth_token: bool = False,
-    **kwargs
+    test_dataset: str = "mnist", submission_dataset: str = "lewtun/mnist-preds", use_auth_token: bool = False, **kwargs
 ) -> Dict[str, Dict[str, Dict[str, float]]]:
     metrics = defaultdict(dict)
     tasks = ["task1", "task2"]
