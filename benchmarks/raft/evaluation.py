@@ -8,12 +8,12 @@ def convert_labels_to_ids(example):
 
 
 def evaluate(
-    evaluation_dataset: str, submission_dataset: str, use_auth_token: str = None, **kwargs
+    test_dataset: str, submission_dataset: str, use_auth_token: str = None, **kwargs
 ) -> List[Dict[str, List]]:
     """Computes metrics for a benchmark.
 
     Args:
-        evaluation_dataset (:obj:`str`): Name of private dataset with ground truth labels.
+        test_dataset (:obj:`str`): Name of private dataset with ground truth labels.
         submission_dataset (:obj:`str`): Name of user submission dataset with model predictions.
         use_auth_token (:obj:`str`): The API token to access your private dataset on the Hugging Face Hub.
 
@@ -32,7 +32,7 @@ def evaluate(
     for task in tasks:
         task_data = {task: []}
         # Load datasets associated with task
-        evaluation_ds = load_dataset(path=evaluation_dataset, name=task, use_auth_token=use_auth_token)
+        evaluation_ds = load_dataset(path=test_dataset, name=task, use_auth_token=use_auth_token)
         submission_ds = load_dataset(path=submission_dataset, name=task, use_auth_token=use_auth_token)
         # Sort by title for alignment
         evaluation_ds = evaluation_ds.sort("title")
