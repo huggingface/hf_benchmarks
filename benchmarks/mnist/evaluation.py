@@ -5,11 +5,14 @@ from datasets import load_dataset, load_metric
 
 
 def evaluate(
-    test_dataset: str = "mnist", submission_dataset: str = "lewtun/mnist-preds", use_auth_token: bool = False, **kwargs
+    evaluation_dataset: str = "mnist",
+    submission_dataset: str = "lewtun/mnist-preds",
+    use_auth_token: bool = False,
+    **kwargs
 ) -> List[Dict[str, Dict]]:
     metrics = []
     tasks = ["task1", "task2"]
-    test_ds = load_dataset(test_dataset, use_auth_token=use_auth_token)
+    test_ds = load_dataset(evaluation_dataset, use_auth_token=use_auth_token)
     for task in tasks:
         task_data = {task: []}
         preds_ds = load_dataset(submission_dataset, task, use_auth_token=use_auth_token)
