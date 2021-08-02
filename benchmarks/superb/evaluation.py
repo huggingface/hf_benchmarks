@@ -7,7 +7,7 @@ from datasets import load_dataset, load_metric
 def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> List[Dict[str, List]]:
     # Extract task associated with submission dataset
     header = {"Authorization": "Bearer " + use_auth_token}
-    response = requests.get("http://huggingface.co/api/datasets/lewtun/asr-preds-test", headers=header)
+    response = requests.get(f"http://huggingface.co/api/datasets/{submission_dataset}", headers=header)
     info = response.json()
     task = [t.split(":")[1] for t in info["tags"] if t.split(":")[0] == "task"][0]
 
