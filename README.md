@@ -1,4 +1,4 @@
-# evaluate
+# Evaluate
 A starter kit for evaluating benchmarks on the [🤗 Hub](https://huggingface.co)
 
 ## Adding a new benchmark
