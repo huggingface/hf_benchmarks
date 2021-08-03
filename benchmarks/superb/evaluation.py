@@ -1,7 +1,10 @@
+from dataclasses import asdict
 from typing import Dict, List
 
 import requests
 from datasets import load_dataset, load_metric
+
+from evaluate.schemas import Evaluation, Metric, Task
 
 
 def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> List[Dict[str, List]]:
@@ -9,9 +12,9 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
     header = {"Authorization": "Bearer " + use_auth_token}
     response = requests.get(f"http://huggingface.co/api/datasets/{submission_dataset}", headers=header)
     info = response.json()
-    task = [t.split(":")[1] for t in info["tags"] if t.split(":")[0] == "task"][0]
+    task_name = [t.split(":")[1] for t in info["tags"] if t.split(":")[0] == "task"][0]
 
-    eval_ds = load_dataset(evaluation_dataset, task, split="test", use_auth_token=use_auth_token)
+    eval_ds = load_dataset(evaluation_dataset, task_name, split="test", use_auth_token=use_auth_token)
     # TODO(lewtun): Use dataset loading script instead of relying on hard-coded paths
     sub_ds = load_dataset(
         "json",
@@ -20,10 +23,13 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
         use_auth_token=use_auth_token,
     )
 
-    metrics = []
-    if task == "asr":
-        wer_metric = load_metric("wer")
-        metric = wer_metric.compute(predictions=sub_ds["text"], references=eval_ds["text"])
-        metrics.append({task: [{"metrics": [{"name": wer_metric.name, "value": metric, "split": "test"}]}]})
+    evaluation = Evaluation()
 
-    return metrics
+    if task_name == "asr":
+        task = Task(name=task_name, type="automatic-speech-recognition")
+        wer_metric = load_metric("wer")
+        value = wer_metric.compute(predictions=sub_ds["text"], references=eval_ds["text"])
+        task.metrics.append(Metric(name="wer", type="wer", value=value))
+        evaluation.results.append({"task": task})
+
+    return asdict(evaluation)
