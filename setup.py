@@ -61,8 +61,10 @@ REQUIRED_PKGS = [
 
 QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1"]
 
+TESTS_REQUIRE = ["pytest", "pytest-cov"]
 
-EXTRAS_REQUIRE = {"quality": QUALITY_REQUIRE}
+
+EXTRAS_REQUIRE = {"quality": QUALITY_REQUIRE, "tests": TESTS_REQUIRE}
 
 benchmark_dependencies = list(Path("benchmarks/").glob("**/requirements.txt"))
 for benchmark in benchmark_dependencies:
