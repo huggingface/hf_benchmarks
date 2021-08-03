@@ -7,9 +7,7 @@ def convert_labels_to_ids(example):
     return {"label": 1} if example["answer"] == "Safety" else {"label": 0}
 
 
-def evaluate(
-    evaluation_dataset: str, submission_dataset: str, use_auth_token: str = None, **kwargs
-) -> List[Dict[str, List]]:
+def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str = None) -> List[Dict[str, List]]:
     """Computes metrics for a benchmark.
 
     Args:

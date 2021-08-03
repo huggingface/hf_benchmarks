@@ -5,7 +5,7 @@ from datasets import load_dataset, load_metric
 
 
 # IMPLEMENT THIS
-def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str, **kwargs) -> List[Dict[str, List]]:
+def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> List[Dict[str, List]]:
     """Computes metrics for a benchmark.
 
     Args:
