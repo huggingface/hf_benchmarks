@@ -10,7 +10,7 @@ on:
 
 jobs:
 
-  build:
+  test_evaluate:
     runs-on: ubuntu-latest
 
     steps:
