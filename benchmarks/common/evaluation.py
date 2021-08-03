@@ -1,4 +1,3 @@
-from os import name
 from typing import Dict, List
 
 from datasets import load_dataset, load_metric

@@ -49,22 +49,25 @@ To create the package for pypi.
 
 from pathlib import Path
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 DOCLINES = __doc__.split("\n")
 
 
-REQUIRED_PKGS = [
-    "datasets>=1.9",
-]
-
+REQUIRED_PKGS = ["datasets>=1.9,<2.0", "pydantic>=1.8,<2.0"]
 
 QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1"]
 
 TESTS_REQUIRE = ["pytest", "pytest-cov"]
 
-
 EXTRAS_REQUIRE = {"quality": QUALITY_REQUIRE, "tests": TESTS_REQUIRE}
+
+
+def combine_requirements(base_keys):
+    return list(set(k for v in base_keys for k in EXTRAS_REQUIRE[v]))
+
+
+EXTRAS_REQUIRE["dev"] = combine_requirements([k for k in EXTRAS_REQUIRE])
 
 benchmark_dependencies = list(Path("benchmarks/").glob("**/requirements.txt"))
 for benchmark in benchmark_dependencies:
