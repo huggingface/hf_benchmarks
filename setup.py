@@ -54,7 +54,7 @@ from setuptools import find_packages, setup
 DOCLINES = __doc__.split("\n")
 
 
-REQUIRED_PKGS = ["datasets>=1.9,<2.0", "pydantic>=1.8,<2.0"]
+REQUIRED_PKGS = ["datasets==1.11.0"]
 
 QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1"]
 
