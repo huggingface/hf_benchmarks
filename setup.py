@@ -54,17 +54,20 @@ from setuptools import find_packages, setup
 DOCLINES = __doc__.split("\n")
 
 
-REQUIRED_PKGS = [
-    "datasets>=1.9",
-]
-
+REQUIRED_PKGS = ["datasets==1.11.0"]
 
 QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1"]
 
 TESTS_REQUIRE = ["pytest", "pytest-cov"]
 
-
 EXTRAS_REQUIRE = {"quality": QUALITY_REQUIRE, "tests": TESTS_REQUIRE}
+
+
+def combine_requirements(base_keys):
+    return list(set(k for v in base_keys for k in EXTRAS_REQUIRE[v]))
+
+
+EXTRAS_REQUIRE["dev"] = combine_requirements([k for k in EXTRAS_REQUIRE])
 
 benchmark_dependencies = list(Path("benchmarks/").glob("**/requirements.txt"))
 for benchmark in benchmark_dependencies:
@@ -81,6 +84,8 @@ setup(
     author_email="lewis@huggingface.co",
     url="https://github.com/huggingface/evaluate",
     download_url="https://github.com/huggingface/evaluate/tags",
+    package_dir={"": "src"},
+    packages=find_packages("src"),
     license="Apache 2.0",
     install_requires=REQUIRED_PKGS,
     extras_require=EXTRAS_REQUIRE,

@@ -1,3 +1,2 @@
-datasets>=1.11.0
-huggingface-hub>=0.0.15
+datasets==1.11.0
 jiwer
