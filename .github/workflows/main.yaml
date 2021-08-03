@@ -1,4 +1,4 @@
-name: Superb
+name: Test benchmarks
 
 on:
   push:
