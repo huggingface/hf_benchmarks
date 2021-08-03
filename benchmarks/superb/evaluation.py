@@ -14,9 +14,9 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
     info = response.json()
     task_name = [t.split(":")[1] for t in info["tags"] if t.split(":")[0] == "task"][0]
 
-    eval_ds = load_dataset(evaluation_dataset, task_name, split="test", use_auth_token=use_auth_token)
+    evaluation_ds = load_dataset(evaluation_dataset, task_name, split="test", use_auth_token=use_auth_token)
     # TODO(lewtun): Use dataset loading script instead of relying on hard-coded paths
-    sub_ds = load_dataset(
+    submission_ds = load_dataset(
         "json",
         data_files=f"https://huggingface.co/datasets/{submission_dataset}/resolve/main/preds.jsonl",
         split="train",
@@ -28,7 +28,7 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
     if task_name == "asr":
         task = Task(name=task_name, type="automatic-speech-recognition")
         wer_metric = load_metric("wer")
-        value = wer_metric.compute(predictions=sub_ds["text"], references=eval_ds["text"])
+        value = wer_metric.compute(predictions=submission_ds["text"], references=evaluation_ds["text"])
         task.metrics.append(Metric(name="wer", type="wer", value=value))
         evaluation.results.append({"task": task})
 
