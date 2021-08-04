@@ -1,13 +1,33 @@
-from typing import Dict, List
+from typing import List, Optional, TypedDict, Union
 
 from datasets import load_dataset, load_metric
+
+
+class Metric(TypedDict):
+    name: str
+    type: str
+    value: Union[float, Optional[dict]]
+
+
+class Task(TypedDict):
+    name: str
+    type: str
+    metrics: List[Metric]
+
+
+class Result(TypedDict):
+    task: Task
+
+
+class Evaluation(TypedDict):
+    results: List[Result]
 
 
 def convert_labels_to_ids(example):
     return {"label": 1} if example["answer"] == "Safety" else {"label": 0}
 
 
-def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str = None) -> List[Dict[str, List]]:
+def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> Evaluation:
     """Computes metrics for a benchmark.
 
     Args:
@@ -20,38 +40,35 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
     """
 
     # If your benchmark has multiple tasks, define their names here
-    tasks = ["safety_or_not"]
+    tasks = ["TAISafety-binary"]
     # Load metric
     # TODO(lewtun): add more metrics!
     f1 = load_metric("f1")
     # Define container to store metrics
-    metrics = []
+    evaluation = Evaluation(results=[])
     # Iterate over tasks and build up metrics
     for task in tasks:
-        task_data = {task: []}
+        task_data = Task(name=task, type="text-classification", metrics=[])
         # Load datasets associated with task
         evaluation_ds = load_dataset(path=evaluation_dataset, name=task, use_auth_token=use_auth_token)
         submission_ds = load_dataset(path=submission_dataset, name=task, use_auth_token=use_auth_token)
         # Sort by title for alignment
-        evaluation_ds = evaluation_ds.sort("title")
-        submission_ds = submission_ds.sort("title")
+        evaluation_ds = evaluation_ds.sort("title")  # type: ignore
+        submission_ds = submission_ds.sort("title")  # type: ignore
         # Create label IDs
         # TODO(lewtun): use ClassLabel type on Dataset side to skip this
         evaluation_ds = evaluation_ds.map(convert_labels_to_ids)
         submission_ds = submission_ds.map(convert_labels_to_ids)
         # Compute metrics and build up list of dictionaries, one per task in your benchmark
-        for split in evaluation_ds.keys():
-            split_data = {}
-            scores = f1.compute(
-                predictions=submission_ds[split]["label"],
-                references=evaluation_ds[split]["label"],
-                average="binary",
-            )
-            split_data["split"] = split
-            split_data["metrics"] = []
-            for k, v in scores.items():
-                split_data["metrics"].append({"name": k, "value": v.tolist()})
-            task_data[task].append(split_data)
-        metrics.append(task_data)
+        scores = f1.compute(
+            predictions=submission_ds["test"]["label"],
+            references=evaluation_ds["test"]["label"],
+            average="binary",
+        )
+        for k, v in scores.items():  # type: ignore
+            task_data["metrics"].append(Metric(name=k, type=k, value=v))
+        # Collect results
+        result = Result(task=task_data)
+        evaluation["results"].append(result)
 
-    return metrics
+    return evaluation

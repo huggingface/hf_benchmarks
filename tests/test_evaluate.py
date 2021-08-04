@@ -3,6 +3,7 @@ import inspect
 
 from benchmarks import registry
 
+
 # TODO(lewtun): use common.evaluation.evaluate as reference?
 EVALUATE_ARGS = {"evaluation_dataset", "submission_dataset", "use_auth_token"}
 
