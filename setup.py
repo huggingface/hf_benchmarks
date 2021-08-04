@@ -56,7 +56,7 @@ DOCLINES = __doc__.split("\n")
 
 REQUIRED_PKGS = ["datasets==1.11.0"]
 
-QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1", "mypy"]
+QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1", "mypy", "types-requests"]
 
 TESTS_REQUIRE = ["pytest", "pytest-cov"]
 
