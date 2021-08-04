@@ -1,4 +1,4 @@
-name: Test benchmarks
+name: Benchmark tests
 
 on:
   push:
@@ -26,19 +26,3 @@ jobs:
           python -m pip install ".[tests]"
       - name: Run unit tests
         run: pytest
-
-  check_code_quality:
-    name: Check code quality
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install ".[quality]"
-    - name: Code quality
-      run: make quality
