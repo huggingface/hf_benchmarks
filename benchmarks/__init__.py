@@ -1,5 +1,6 @@
 from .registration import Benchmark, registry
 
+
 superb = Benchmark(name="superb")
 raft = Benchmark(name="raft")
 common = Benchmark(name="common")

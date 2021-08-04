@@ -51,6 +51,7 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
+
 DOCLINES = __doc__.split("\n")
 
 

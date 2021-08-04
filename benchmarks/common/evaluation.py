@@ -1,13 +1,30 @@
-from dataclasses import asdict
-from typing import Dict, List
+from typing import List, Optional, TypedDict, Union
 
 from datasets import load_dataset, load_metric
 
-from evaluate.schemas import Evaluation, Metric, Task
+
+class Metric(TypedDict):
+    name: str
+    type: str
+    value: Union[float, Optional[dict]]
+
+
+class Task(TypedDict):
+    name: str
+    type: str
+    metrics: List[Metric]
+
+
+class Result(TypedDict):
+    task: Task
+
+
+class Evaluation(TypedDict):
+    results: List[Result]
 
 
 # IMPLEMENT THIS
-def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> List[Dict[str, List]]:
+def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> Evaluation:
     """Computes metrics for a benchmark.
 
     Args:
@@ -24,16 +41,16 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
     # Load one or more metrics
     metric = load_metric("your_metric_name")
     # Iterate over tasks and build up metrics
-    evaluation = Evaluation()
+    evaluation = Evaluation(results=[])
     for task_name in tasks:
         # Create task
-        task = Task(name=task_name, type="some-task-type")
+        task = Task(name=task_name, type="some-task-type", metrics=[])
         # Load datasets associated with task
         evaluation_ds = load_dataset(path=evaluation_dataset, name=task_name, use_auth_token=use_auth_token)
         submission_ds = load_dataset(path=submission_dataset, name=task_name, use_auth_token=use_auth_token)
         # Compute metrics and build up list of dictionaries, one per task in your benchmark
-        value = metric.compute(predictions=submission_ds["preds_column"], references=evaluation_ds["targets_column"])
-        task.metrics.append(Metric(name="your_metric_name", type="your_metric_name", value=value))
-        evaluation.results.append({"task": task})
+        value = metric.compute(predictions=submission_ds["preds_column"], references=evaluation_ds["targets_column"])  # type: ignore
+        task["metrics"].append(Metric(name="your_metric_name", type="your_metric_name", value=value))
+        evaluation["results"].append({"task": task})
 
-    return asdict(evaluation)
+    return evaluation
