@@ -1,13 +1,30 @@
-from dataclasses import asdict
-from typing import Dict, List
+from typing import List, Optional, TypedDict, Union
 
 import requests
 from datasets import load_dataset, load_metric
 
-from evaluate.schemas import Evaluation, Metric, Task
+
+class Metric(TypedDict):
+    name: str
+    type: str
+    value: Union[float, Optional[dict]]
 
 
-def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> List[Dict[str, List]]:
+class Task(TypedDict):
+    name: str
+    type: str
+    metrics: List[Metric]
+
+
+class Result(TypedDict):
+    task: Task
+
+
+class Evaluation(TypedDict):
+    results: List[Result]
+
+
+def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> Evaluation:
     # Extract task associated with submission dataset
     header = {"Authorization": "Bearer " + use_auth_token}
     response = requests.get(f"http://huggingface.co/api/datasets/{submission_dataset}", headers=header)
@@ -18,18 +35,22 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
     # TODO(lewtun): Use dataset loading script instead of relying on hard-coded paths
     submission_ds = load_dataset(
         "json",
-        data_files=f"https://huggingface.co/datasets/{submission_dataset}/resolve/main/preds.jsonl",
+        data_files=[f"https://huggingface.co/datasets/{submission_dataset}/resolve/main/preds.jsonl"],
         split="train",
         use_auth_token=use_auth_token,
     )
 
-    evaluation = Evaluation()
+    evaluation = Evaluation(results=[])
 
     if task_name == "asr":
-        task = Task(name=task_name, type="automatic-speech-recognition")
+        # Define task
+        task = Task(name=task_name, type="automatic-speech-recognition", metrics=[])
+        # Compute metrics
         wer_metric = load_metric("wer")
-        value = wer_metric.compute(predictions=submission_ds["text"], references=evaluation_ds["text"])
-        task.metrics.append(Metric(name="wer", type="wer", value=value))
-        evaluation.results.append({"task": task})
+        value = wer_metric.compute(predictions=submission_ds["text"], references=evaluation_ds["text"])  # type: ignore
+        task["metrics"].append(Metric(name="wer", type="wer", value=value))
+        # Collect results
+        result = Result(task=task)
+        evaluation["results"].append(result)
 
-    return asdict(evaluation)
+    return evaluation
