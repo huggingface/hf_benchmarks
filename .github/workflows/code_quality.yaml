@@ -25,5 +25,5 @@ jobs:
           python -m pip install ".[quality]"
       - name: Code quality
         run: |
-        make quality
-        make typecheck
+          make quality
+          make typecheck
