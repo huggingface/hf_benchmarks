@@ -33,8 +33,8 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
         evaluation_ds = load_dataset(path=evaluation_dataset, name=task, use_auth_token=use_auth_token)
         submission_ds = load_dataset(path=submission_dataset, name=task, use_auth_token=use_auth_token)
         # Sort by title for alignment
-        evaluation_ds = evaluation_ds.sort("title")  # type: ignore
-        submission_ds = submission_ds.sort("title")  # type: ignore
+        evaluation_ds = evaluation_ds.sort("title")
+        submission_ds = submission_ds.sort("title")
         # Create label IDs
         # TODO(lewtun): use ClassLabel type on Dataset side to skip this
         evaluation_ds = evaluation_ds.map(convert_labels_to_ids)
@@ -45,7 +45,7 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
             references=evaluation_ds["test"]["label"],
             average="binary",
         )
-        for k, v in scores.items():  # type: ignore
+        for k, v in scores.items():
             task_data["metrics"].append(Metric(name=k, type=k, value=v))
         # Collect results
         result = Result(task=task_data)

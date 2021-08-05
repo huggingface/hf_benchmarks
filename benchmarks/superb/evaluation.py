@@ -27,7 +27,7 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
         task = Task(name=task_name, type="automatic-speech-recognition", metrics=[])
         # Compute metrics
         wer_metric = load_metric("wer")
-        value = wer_metric.compute(predictions=submission_ds["text"], references=evaluation_ds["text"])  # type: ignore
+        value = wer_metric.compute(predictions=submission_ds["text"], references=evaluation_ds["text"])
         task["metrics"].append(Metric(name="wer", type="wer", value=value))
         # Collect results
         result = Result(task=task)
