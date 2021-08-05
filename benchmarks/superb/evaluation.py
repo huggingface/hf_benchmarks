@@ -1,27 +1,7 @@
-from typing import List, Optional, TypedDict, Union
-
 import requests
 from datasets import load_dataset, load_metric
 
-
-class Metric(TypedDict):
-    name: str
-    type: str
-    value: Union[float, Optional[dict]]
-
-
-class Task(TypedDict):
-    name: str
-    type: str
-    metrics: List[Metric]
-
-
-class Result(TypedDict):
-    task: Task
-
-
-class Evaluation(TypedDict):
-    results: List[Result]
+from evaluate import Evaluation, Metric, Result, Task
 
 
 def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> Evaluation:

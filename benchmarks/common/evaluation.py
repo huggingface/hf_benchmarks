@@ -1,26 +1,6 @@
-from typing import List, Optional, TypedDict, Union
-
 from datasets import load_dataset, load_metric
 
-
-class Metric(TypedDict):
-    name: str
-    type: str
-    value: Union[float, Optional[dict]]
-
-
-class Task(TypedDict):
-    name: str
-    type: str
-    metrics: List[Metric]
-
-
-class Result(TypedDict):
-    task: Task
-
-
-class Evaluation(TypedDict):
-    results: List[Result]
+from evaluate import Evaluation, Metric, Result, Task
 
 
 # IMPLEMENT THIS
@@ -39,7 +19,7 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
     # If your benchmark has multiple tasks, define their names here
     tasks = ["task1", "task2"]
     # Load one or more metrics
-    metric = load_metric("your_metric_name")
+    your_metric = load_metric("your_metric_name")
     # Iterate over tasks and build up metrics
     evaluation = Evaluation(results=[])
     for task_name in tasks:
@@ -49,8 +29,11 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
         evaluation_ds = load_dataset(path=evaluation_dataset, name=task_name, use_auth_token=use_auth_token)
         submission_ds = load_dataset(path=submission_dataset, name=task_name, use_auth_token=use_auth_token)
         # Compute metrics and build up list of dictionaries, one per task in your benchmark
-        value = metric.compute(predictions=submission_ds["preds_column"], references=evaluation_ds["targets_column"])  # type: ignore
-        task["metrics"].append(Metric(name="your_metric_name", type="your_metric_name", value=value))
-        evaluation["results"].append({"task": task})
+        value = your_metric.compute(predictions=submission_ds["preds_column"], references=evaluation_ds["targets_column"])  # type: ignore
+        metric = Metric(name="your_metric_name", type="your_metric_name", value=value)
+        task["metrics"].append(metric)
+        # Collect results
+        result = Result(task=task)
+        evaluation["results"].append(result)
 
     return evaluation

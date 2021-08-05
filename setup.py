@@ -49,7 +49,7 @@ To create the package for pypi.
 
 from pathlib import Path
 
-from setuptools import find_packages, setup
+from setuptools import setup
 
 
 DOCLINES = __doc__.split("\n")
@@ -85,8 +85,6 @@ setup(
     author_email="lewis@huggingface.co",
     url="https://github.com/huggingface/evaluate",
     download_url="https://github.com/huggingface/evaluate/tags",
-    package_dir={"": "src"},
-    packages=find_packages("src"),
     license="Apache 2.0",
     install_requires=REQUIRED_PKGS,
     extras_require=EXTRAS_REQUIRE,

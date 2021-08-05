@@ -7,5 +7,5 @@ quality:
 	python -m isort --check-only .
 	python -m flake8 --max-line-length 119
 
-typecheck:
+typecheck-benchmarks:
 	python -m mypy ./benchmarks
