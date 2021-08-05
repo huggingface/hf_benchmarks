@@ -52,7 +52,7 @@ def run(benchmark: str, evaluation_dataset: str):
         if process.returncode == -1:
             typer.echo(f"Error launching evaluation job for submission {submission_dataset} on {benchmark} benchmark!")
         else:
-            match_job_id = re.search("# (\d+)", process.stdout.decode("utf-8"))
+            match_job_id = re.search(r"# (\d+)", process.stdout.decode("utf-8"))
             job_id = match_job_id.group(1)
             typer.echo(
                 f"Successfully launched evaluation job #{job_id} for submission {submission_dataset} on {benchmark} benchmark!"
