@@ -7,6 +7,7 @@ import requests
 import typer
 from dotenv import load_dotenv
 
+
 if Path(".env").is_file():
     load_dotenv(".env")
 
