@@ -1,0 +1,35 @@
+name: Run evaluation
+
+on:
+  schedule:
+    - cron:  '0 */60 * * *'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install requirements
+        run: pip install -r requirements.txt
+
+      - name: AutoNLP login
+        env:
+          HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
+        run: |
+          autonlp login --api-key $HF_HUB_TOKEN
+
+      - name: Execute evaluation script
+        env:
+          HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
+          HF_AUTONLP_BACKEND_API: ${{ secrets.HF_AUTONLP_BACKEND_API }}
+        run: |
+          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft neelalex/raft-test
