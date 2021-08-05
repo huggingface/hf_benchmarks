@@ -44,4 +44,4 @@ jobs:
       - name: Code quality
         run: |
           make quality
-          make typecheck
+          make typecheck-benchmarks
