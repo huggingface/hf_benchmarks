@@ -29,7 +29,9 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
         evaluation_ds = load_dataset(path=evaluation_dataset, name=task_name, use_auth_token=use_auth_token)
         submission_ds = load_dataset(path=submission_dataset, name=task_name, use_auth_token=use_auth_token)
         # Compute metrics and build up list of dictionaries, one per task in your benchmark
-        value = your_metric.compute(predictions=submission_ds["preds_column"], references=evaluation_ds["targets_column"])  # type: ignore
+        value = your_metric.compute(
+            predictions=submission_ds["preds_column"], references=evaluation_ds["targets_column"]
+        )
         metric = Metric(name="your_metric_name", type="your_metric_name", value=value)
         task["metrics"].append(metric)
         # Collect results
