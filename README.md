@@ -1,7 +1,15 @@
 # Evaluate
-A starter kit for evaluating benchmarks on the [🤗 Hub](https://huggingface.co)
+> A toolkit for evaluating benchmarks on the [🤗 Hub](https://huggingface.co)
 
-## Adding a new benchmark
+See the `benchmarks/` folder for current benchmarks.
 
-If you would like to evaluate a new benchmark, following the instructions [here](benchmarks/README.md).
+## Developer installation
+
+Clone the repository and install the requirements:
+
+```
+git clone git@github.com:huggingface/evaluate.git
+cd evaluate
+pip install '.[dev]'
+```
 
