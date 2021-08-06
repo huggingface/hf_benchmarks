@@ -1,4 +1,4 @@
-name: Run evaluation
+name: Run RAFT evaluation
 
 on:
   schedule:
@@ -19,7 +19,7 @@ jobs:
           python-version: 3.8
 
       - name: Install requirements
-        run: pip install -r requirements.txt
+        run: pip install .
 
       - name: AutoNLP login
         env:
@@ -32,4 +32,4 @@ jobs:
           HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
           HF_AUTONLP_BACKEND_API: ${{ secrets.HF_AUTONLP_BACKEND_API }}
         run: |
-          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft neelalex/raft-test
+          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft ought/raft
