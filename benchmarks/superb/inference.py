@@ -13,7 +13,10 @@ if Path(".env").is_file():
 
 def main(model_id: str, dataset_name: str, dataset_config: str, dataset_split: str, dataset_column: str):
     auth_token = os.getenv("HF_HUB_TOKEN")
-    header = {"Authorization": "Bearer " + auth_token}
+    if auth_token is None:
+        raise ValueError("Hugging Face API token not provided! Please set it as an environment variable.")
+    else:
+        header = {"Authorization": "Bearer " + auth_token}
     data = {
         "dataset_name": dataset_name,
         "dataset_config": dataset_config,
