@@ -54,8 +54,8 @@ from setuptools import find_packages, setup
 
 DOCLINES = __doc__.split("\n")
 
-
-REQUIRED_PKGS = ["datasets", "autonlp>=0.3.4", "typer>=0.3.2", "python-dotenv>=0.18.0"]
+# We must upper bound the datasets version to match that in the autonlp backend
+REQUIRED_PKGS = ["datasets>=1.9.0,<=1.11.0", "typer>=0.3.2", "python-dotenv>=0.18.0"]
 
 QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1", "mypy", "types-requests"]
 
@@ -69,6 +69,8 @@ def combine_requirements(base_keys):
 
 
 EXTRAS_REQUIRE["dev"] = combine_requirements([k for k in EXTRAS_REQUIRE])
+
+EXTRAS_REQUIRE["cron"] = ["autonlp>=0.3.4"]
 
 benchmark_dependencies = list(Path("benchmarks/").glob("**/requirements.txt"))
 for benchmark in benchmark_dependencies:
