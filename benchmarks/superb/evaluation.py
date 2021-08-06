@@ -15,7 +15,7 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
     # TODO(lewtun): Use dataset loading script instead of relying on hard-coded paths
     submission_ds = load_dataset(
         "json",
-        data_files=[f"https://huggingface.co/datasets/{submission_dataset}/resolve/main/preds.jsonl"],
+        data_files=[f"https://huggingface.co/datasets/{submission_dataset}/resolve/main/data_asr_test_file.txt"],
         split="train",
         use_auth_token=use_auth_token,
     )

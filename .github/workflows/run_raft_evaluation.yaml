@@ -19,7 +19,7 @@ jobs:
           python-version: 3.8
 
       - name: Install requirements
-        run: pip install .
+        run: pip install '.[cron]'
 
       - name: AutoNLP login
         env:
