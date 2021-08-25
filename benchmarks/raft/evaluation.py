@@ -1,7 +1,7 @@
 import numpy as np
 from datasets import get_dataset_config_names, load_dataset, load_metric
 
-from evaluate import Evaluation, Metric, Result, Task, get_benchmark_tasks
+from evaluate import Evaluation, Metric, Result, Task
 
 
 def convert_labels_to_ids(example):
