@@ -84,3 +84,7 @@ def run(benchmark: str, evaluation_dataset: str):
                 )
             except Exception as e:
                 typer.echo(f"Could not extract AutoNLP job ID due to error: {e}")
+
+
+if __name__ == "__main__":
+    app()
