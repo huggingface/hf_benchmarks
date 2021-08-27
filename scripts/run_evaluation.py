@@ -33,6 +33,8 @@ def get_submission_repos(benchmark: str):
 
     for dataset in all_datasets:
         tags = extract_tags(dataset)
+        # TODO(lewtun): Using prediction-upload might be too restrictive.
+        # Using a generic prediction type might be better to cover other benchmarks
         if tags.get("benchmark") == benchmark and tags.get("type") == "prediction-upload":
             submissions.append(dataset)
 
