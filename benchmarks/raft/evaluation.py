@@ -20,8 +20,8 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
         metrics (:obj:`list`): The evaluation metrics.
     """
 
-    # If your benchmark has multiple tasks, define their names here
-    tasks = get_dataset_config_names(evaluation_dataset)
+    # We need to use the public dataset to get the task names
+    tasks = get_dataset_config_names("ought/raft")
     # Load metric
     f1 = load_metric("f1")
     # Define container to store metrics
