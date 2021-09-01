@@ -4,10 +4,6 @@ from datasets import get_dataset_config_names, load_dataset, load_metric
 from evaluate import Evaluation, Metric, Result, Task
 
 
-def convert_labels_to_ids(example):
-    return {"label": 1} if example["answer"] == "Safety" else {"label": 0}
-
-
 def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> Evaluation:
     """Computes metrics for a benchmark.
 
@@ -31,16 +27,16 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
         task_data = Task(name=task, type="text-classification", metrics=[])
         # Load datasets associated with task
         # TODO(lewtun): select test split and sort by IDs - need to convert to int first!
-        evaluation_ds = load_dataset(path=evaluation_dataset, name=task, use_auth_token=use_auth_token)
-        submission_ds = load_dataset(path=submission_dataset, name=task, use_auth_token=use_auth_token)
+        evaluation_ds = load_dataset(path=evaluation_dataset, name=task, use_auth_token=use_auth_token, split="test")
+        submission_ds = load_dataset(path=submission_dataset, name=task, use_auth_token=use_auth_token, split="test")
         # Compute metrics and build up list of dictionaries, one per task in the benchmark
         scores = f1.compute(
-            predictions=submission_ds["test"]["Label"],
-            references=evaluation_ds["test"]["Label"],
+            predictions=submission_ds["Label"],
+            references=evaluation_ds["Label"],
             average="macro",
         )
         for k, v in scores.items():
-            task_data["metrics"].append(Metric(name=k, type=k, value=np.random.random()))
+            task_data["metrics"].append(Metric(name=k, type=k, value=v))
         # Collect results
         result = Result(task=task_data)
         evaluation["results"].append(result)
