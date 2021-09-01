@@ -1,4 +1,3 @@
-import numpy as np
 from datasets import get_dataset_config_names, load_dataset, load_metric
 
 from evaluate import Evaluation, Metric, Result, Task
