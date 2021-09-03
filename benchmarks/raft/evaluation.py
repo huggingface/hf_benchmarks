@@ -12,7 +12,7 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
         use_auth_token (:obj:`str`): The API token to access your private dataset on the Hugging Face Hub.
 
     Returns:
-        metrics (:obj:`list`): The evaluation metrics.
+        evaluation (:obj:`Evaluation`): The evaluation metrics.
     """
 
     # We need to use the public dataset to get the task names
@@ -22,12 +22,14 @@ def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: s
     # Define container to store metrics
     evaluation = Evaluation(results=[])
     # Iterate over tasks and build up metrics
-    for task in tasks:
+    for task in sorted(tasks):
         task_data = Task(name=task, type="text-classification", metrics=[])
         # Load datasets associated with task
-        # TODO(lewtun): select test split and sort by IDs - need to convert to int first!
         evaluation_ds = load_dataset(path=evaluation_dataset, name=task, use_auth_token=use_auth_token, split="test")
         submission_ds = load_dataset(path=submission_dataset, name=task, use_auth_token=use_auth_token, split="test")
+        # Sort IDs to ensure we compare the correct examples
+        evaluation_ds = evaluation_ds.sort("ID")
+        submission_ds = submission_ds.sort("ID")
         # Compute metrics and build up list of dictionaries, one per task in the benchmark
         scores = f1.compute(
             predictions=submission_ds["Label"],
