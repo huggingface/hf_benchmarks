@@ -57,7 +57,7 @@ def get_benchmark_repos(
         if token is None:
             raise EnvironmentError("You specified use_auth_token=True, but a huggingface token was not found.")
         headers = {"Authorization": f"Bearer {token}"}
-    params = {"full": True} if endpoint == "models" else None
+    params = {"full": True}
     response = requests.get(f"http://huggingface.co/api/{endpoint}/", headers=headers, params=params)
     response.raise_for_status()
     repos = response.json()
