@@ -1,6 +1,6 @@
-from datetime import datetime
 from typing import Dict, List, Union
 
+import pandas as pd
 import requests
 import typer
 from huggingface_hub import HfApi, HfFolder
@@ -12,6 +12,18 @@ def delete_repos(repository_ids: List[str], auth_token: str, repo_type: str = "d
         org, name = repo_id.split("/")
         HfApi().delete_repo(token=auth_token, organization=org, name=name, repo_type=repo_type)
         typer.echo(f"Deleted repo: {repo_id}")
+
+
+def is_time_between(begin_time: str, end_time: str, check_time: str = None) -> bool:
+    # Adapted from: https://stackoverflow.com/questions/10048249/how-do-i-determine-if-current-time-is-within-a-specified-range-using-pythons-da
+    # If check time is not given, default to current UTC time
+    begin_time = pd.to_datetime(begin_time).tz_localize("UTC")
+    end_time = pd.to_datetime(end_time).tz_localize("UTC")
+    check_time = pd.to_datetime(check_time) or pd.Timestamp.now()
+    if begin_time < end_time:
+        return check_time >= begin_time and check_time <= end_time
+    else:  # crosses midnight
+        return check_time >= begin_time or check_time <= end_time
 
 
 def extract_tags(repo_info: Dict) -> Dict:
@@ -69,19 +81,15 @@ def get_benchmark_repos(
     repos = response.json()
     submissions = []
 
-    for repo in repos:
-        # Check whether submission falls within submission window
-        if submission_window_start and submission_window_end:
-            window_start = datetime.strptime(submission_window_start, "%Y-%m-%d")
-            window_end = datetime.strptime(submission_window_end, "%Y-%m-%d")
-            last_modified = repo.get("lastModified")
-            if last_modified:
-                timestamp = datetime.strptime(last_modified, "%Y-%m-%dT%H:%M:%S.%fZ")
-                if timestamp >= window_start and timestamp <= window_end:
-                    pass
-            else:
-                continue
+    # Filter for repos that fall within submission window
+    if submission_window_start and submission_window_end:
+        repos = [
+            repo
+            for repo in repos
+            if is_time_between(submission_window_start, submission_window_end, repo.get("lastModified"))
+        ]
 
+    for repo in repos:
         tags = extract_tags(repo)
         # Filter submission templates which have the submission_name="none" default value
         if (

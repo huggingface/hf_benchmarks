@@ -9,3 +9,6 @@ quality:
 
 typecheck-benchmarks:
 	python -m mypy ./benchmarks
+
+test:
+	python -m pytest -sv tests/

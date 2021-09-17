@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from huggingface_hub import HfFolder
+import pandas as pd
 
 from evaluate import extract_tags, get_benchmark_repos
 
@@ -41,13 +41,6 @@ class ExtractTagsTest(TestCase):
 
 
 class GetBenchmarkReposTest(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        """
-        Share this valid token in all tests below.
-        """
-        cls._token = HfFolder.get_token()
-
     def test_no_datasets_repo(self):
         data = get_benchmark_repos(
             benchmark=BOGUS_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
@@ -80,3 +73,42 @@ class GetBenchmarkReposTest(TestCase):
         )
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["modelId"], DUMMY_MODEL_ID)
+
+    def test_repo_in_submission_window(self):
+        # Grab repo to extract timestamp
+        # TODO(lewtun): Use HfApi.dataset_info if we bump huggingface-hub in AutoNLP backend
+        repo = get_benchmark_repos(
+            benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
+        )
+        submission_time = pd.to_datetime(repo[0].get("lastModified"))
+        start_date = str((submission_time - pd.Timedelta(days=1)).date())
+        end_date = str((submission_time + pd.Timedelta(days=1)).date())
+        data = get_benchmark_repos(
+            benchmark=DUMMY_BENCHMARK_NAME,
+            use_auth_token=True,
+            endpoint="datasets",
+            repo_type="prediction",
+            submission_window_start=start_date,
+            submission_window_end=end_date,
+        )
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["id"], DUMMY_PREDICTION_ID)
+
+    def test_repo_outside_submission_window(self):
+        # Grab repo to extract timestamp
+        # TODO(lewtun): Use HfApi.dataset_info if we bump huggingface-hub in AutoNLP backend
+        repo = get_benchmark_repos(
+            benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
+        )
+        submission_time = pd.to_datetime(repo[0].get("lastModified"))
+        start_date = str((submission_time + pd.Timedelta(days=1)).date())
+        end_date = str((submission_time + pd.Timedelta(days=2)).date())
+        data = get_benchmark_repos(
+            benchmark=DUMMY_BENCHMARK_NAME,
+            use_auth_token=True,
+            endpoint="datasets",
+            repo_type="prediction",
+            submission_window_start=start_date,
+            submission_window_end=end_date,
+        )
+        self.assertEqual(len(data), 0)
