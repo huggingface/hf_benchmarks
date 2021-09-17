@@ -88,8 +88,8 @@ class GetBenchmarkReposTest(TestCase):
             use_auth_token=True,
             endpoint="datasets",
             repo_type="prediction",
-            submission_window_start=start_date,
-            submission_window_end=end_date,
+            start_date=start_date,
+            end_date=end_date,
         )
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["id"], DUMMY_PREDICTION_ID)
@@ -108,7 +108,7 @@ class GetBenchmarkReposTest(TestCase):
             use_auth_token=True,
             endpoint="datasets",
             repo_type="prediction",
-            submission_window_start=start_date,
-            submission_window_end=end_date,
+            start_date=start_date,
+            end_date=end_date,
         )
         self.assertEqual(len(data), 0)

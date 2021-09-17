@@ -51,8 +51,8 @@ def get_benchmark_repos(
     use_auth_token: Union[bool, str, None] = None,
     endpoint: str = "datasets",
     repo_type: str = "prediction",
-    submission_window_start: str = None,
-    submission_window_end: str = None,
+    start_date: str = None,
+    end_date: str = None,
 ) -> List[Dict]:
     """Gets the metadata associated with benchmark submission and evaluation repositories.
 
@@ -61,8 +61,8 @@ def get_benchmark_repos(
         auth_token: The authentication token for the Hugging Face Hub
         endpoint: The endpoint to query. Can be `datasets` or `models`.
         repo_type: The type of benchmark repository. Can be `prediction`, `model` or `evaluation`.
-        submission_window_start: The timestamp for the start of the submission window.
-        submission_window_end: The timestamp for the end of the submission window.
+        start_date: The timestamp for the start of the submission window.
+        end_date: The timestamp for the end of the submission window.
 
     Returns:
         The benchmark repositories' metadata of a given `repo_type`.
@@ -82,12 +82,8 @@ def get_benchmark_repos(
     submissions = []
 
     # Filter for repos that fall within submission window
-    if submission_window_start and submission_window_end:
-        repos = [
-            repo
-            for repo in repos
-            if is_time_between(submission_window_start, submission_window_end, repo.get("lastModified"))
-        ]
+    if start_date and end_date:
+        repos = [repo for repo in repos if is_time_between(start_date, end_date, repo.get("lastModified"))]
 
     for repo in repos:
         tags = extract_tags(repo)
