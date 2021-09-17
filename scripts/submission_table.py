@@ -8,11 +8,6 @@ from dotenv import load_dotenv
 from evaluate import get_benchmark_repos
 
 
-if Path(".env").is_file():
-    load_dotenv(".env")
-
-auth_token = os.getenv("HF_HUB_TOKEN")
-
 app = typer.Typer()
 
 
