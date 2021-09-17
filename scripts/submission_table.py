@@ -1,9 +1,7 @@
 import os
-from pathlib import Path
 
 import pandas as pd
 import typer
-from dotenv import load_dotenv
 
 from evaluate import get_benchmark_repos
 
