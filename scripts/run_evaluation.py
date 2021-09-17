@@ -8,7 +8,7 @@ import requests
 import typer
 from dotenv import load_dotenv
 
-from evaluate import extract_benchmark_tags, get_benchmark_repos
+from evaluate import extract_tags, get_benchmark_repos
 
 
 if Path(".env").is_file():
@@ -33,7 +33,7 @@ def run(benchmark: str, evaluation_dataset: str):
         )
         data = response.json()
         # Extract submission name from YAML tags
-        tags = extract_benchmark_tags(data)
+        tags = extract_tags(data)
         # Extract submission timestamp and convert to Unix epoch in nanoseconds
         timestamp = pd.to_datetime(data["lastModified"])
         submission_timestamp = int(timestamp.timestamp() * 10 ** 9)
