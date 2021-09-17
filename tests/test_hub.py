@@ -1,6 +1,8 @@
+import os
 from unittest import TestCase
 
 import pandas as pd
+from huggingface_hub import HfFolder
 
 from evaluate import extract_tags, get_benchmark_repos
 
@@ -41,6 +43,15 @@ class ExtractTagsTest(TestCase):
 
 
 class GetBenchmarkReposTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        """
+        Share this valid token in all tests below. Needed for CI
+        """
+        token = os.getenv("HF_HUB_TOKEN")
+        if token:
+            HfFolder.save_token(token)
+
     def test_no_datasets_repo(self):
         data = get_benchmark_repos(
             benchmark=BOGUS_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
