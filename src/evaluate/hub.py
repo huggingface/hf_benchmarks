@@ -1,16 +1,8 @@
-from typing import List
+from typing import Dict, List
 
 import requests
 import typer
 from huggingface_hub import HfApi
-
-
-def extract_tags(dataset):
-    tags = {}
-    for tag in dataset["tags"]:
-        k, v = tuple(tag.split(":", 1))
-        tags[k] = v
-    return tags
 
 
 def delete_repos(repository_ids: List[str], auth_token: str, repo_type: str = "dataset"):
@@ -21,20 +13,43 @@ def delete_repos(repository_ids: List[str], auth_token: str, repo_type: str = "d
         typer.echo(f"Deleted repo: {repo_id}")
 
 
-def get_benchmark_repos(benchmark: str, auth_token: str, repo_type: str = "prediction"):
+def extract_benchmark_tags(repo_info: Dict) -> Dict:
+    """Extracts benchmark tags from a repository's metadata.
+
+    Args:
+        repo_info: The repository's metadata.
+
+    Returns:
+        The benchmark tags.
+    """
+    benchmark_tags = {}
+    repo_tags = repo_info.get("tags")
+    if repo_tags:
+        for tag in repo_tags:
+            if len(tag.split(":", 1)) == 2:
+                k, v = tuple(tag.split(":", 1))
+                benchmark_tags[k] = v
+    return benchmark_tags
+
+
+def get_benchmark_repos(
+    benchmark: str, auth_token: str, endpoint: str = "datasets", submission_type: str = "prediction"
+) -> List[Dict]:
     header = {"Authorization": "Bearer " + auth_token}
-    response = requests.get("http://huggingface.co/api/datasets", headers=header)
-    all_datasets = response.json()
+    params = {"full": True} if endpoint == "models" else None
+    response = requests.get(f"http://huggingface.co/api/{endpoint}/", headers=header, params=params)
+    response.raise_for_status()
+    repos = response.json()
     submissions = []
 
-    for dataset in all_datasets:
-        tags = extract_tags(dataset)
-        # Filter submission templates which have submission_name = "none" by default
+    for repo in repos:
+        tags = extract_benchmark_tags(repo)
+        # Filter submission templates which have the submission_name="none" default value
         if (
             tags.get("benchmark") == benchmark
             and tags.get("submission_name") != "none"
-            and tags.get("type") == repo_type
+            and tags.get("type") == submission_type
         ):
-            submissions.append(dataset)
+            submissions.append(repo)
 
     return submissions
