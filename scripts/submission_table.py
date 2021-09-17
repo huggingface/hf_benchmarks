@@ -23,7 +23,7 @@ def run(
     repo_type: str = "prediction",
     start_date: str = None,
     end_date: str = None,
-    save_path: str = ".",
+    save_path: str = "./data",
 ):
     if start_date is None or end_date is None:
         default_start_time = pd.Timestamp.now()
