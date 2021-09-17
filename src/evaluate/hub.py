@@ -1,8 +1,8 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import requests
 import typer
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, HfFolder
 
 
 def delete_repos(repository_ids: List[str], auth_token: str, repo_type: str = "dataset") -> None:
@@ -34,7 +34,10 @@ def extract_tags(repo_info: Dict) -> Dict:
 
 
 def get_benchmark_repos(
-    benchmark: str, auth_token: str, endpoint: str = "datasets", repo_type: str = "prediction"
+    benchmark: str,
+    use_auth_token: Union[bool, str, None] = None,
+    endpoint: str = "datasets",
+    repo_type: str = "prediction",
 ) -> List[Dict]:
     """Gets the metadata associated with benchmark submission and evaluation repositories.
 
@@ -42,14 +45,20 @@ def get_benchmark_repos(
         benchmark: The benchmark name.
         auth_token: The authentication token for the Hugging Face Hub
         endpoint: The endpoint to query. Can be `datasets` or `models`.
-        repo_type: The type of benchmark repository. Can be `prediction`, `model-upload` or `evaluation`.
+        repo_type: The type of benchmark repository. Can be `prediction`, `model` or `evaluation`.
 
     Returns:
         The benchmark repositories' metadata of a given `repo_type`.
     """
-    header = {"Authorization": "Bearer " + auth_token}
+    if isinstance(use_auth_token, str):
+        headers = {"Authorization": f"Bearer {use_auth_token}"}
+    elif use_auth_token:
+        token = HfFolder.get_token()
+        if token is None:
+            raise EnvironmentError("You specified use_auth_token=True, but a huggingface token was not found.")
+        headers = {"Authorization": f"Bearer {token}"}
     params = {"full": True} if endpoint == "models" else None
-    response = requests.get(f"http://huggingface.co/api/{endpoint}/", headers=header, params=params)
+    response = requests.get(f"http://huggingface.co/api/{endpoint}/", headers=headers, params=params)
     response.raise_for_status()
     repos = response.json()
     submissions = []
