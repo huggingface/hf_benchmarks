@@ -1,11 +1,8 @@
 name: Run RAFT evaluation
 
 on:
-  # schedule:
-  #   - cron:  '0 */60 * * *'
-  pull_request:
-    branches:
-      - main
+  schedule:
+    - cron:  '0 0 * * SUN' # Run evaluation at midnight every Sunday
 
 jobs:
 
