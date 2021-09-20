@@ -27,9 +27,23 @@ jobs:
         run: |
           autonlp login --api-key $HF_HUB_TOKEN
 
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYYMMDD-HH
+          utcOffset: "+08:00"
+      - name: Set end of submission window
+        env:
+          YEAR: "${{ steps.current-time.outputs.year }}"
+          MONTH: "${{ steps.current-time.outputs.month }}"
+          DAY: "${{ steps.current-time.outputs.day }}"
+          END_DATE: $YEAR-$MONTH-$DAY
+        run: echo $END_DATE
+
       - name: Execute evaluation script
         env:
           HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
           HF_AUTONLP_BACKEND_API: ${{ secrets.HF_AUTONLP_BACKEND_API }}
         run: |
-          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft ought/raft
+          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft ought/raft $END_DATE 7

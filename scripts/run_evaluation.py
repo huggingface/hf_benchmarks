@@ -20,8 +20,10 @@ app = typer.Typer()
 
 
 @app.command()
-def run(benchmark: str, evaluation_dataset: str):
-    submissions = get_benchmark_repos(benchmark, use_auth_token=auth_token)
+def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: int):
+    submissions = get_benchmark_repos(
+        benchmark, use_auth_token=auth_token, end_date=end_date, previous_days=previous_days
+    )
     typer.echo(f"Found {len(submissions)} submissions to evaluate on benchmark {benchmark}")
     header = {"Authorization": f"Bearer {auth_token}"}
     for submission in submissions:
