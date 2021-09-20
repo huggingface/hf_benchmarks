@@ -1,8 +1,11 @@
 name: Run RAFT evaluation
 
 on:
-  schedule:
-    - cron:  '0 */60 * * *'
+  # schedule:
+  #   - cron:  '0 */60 * * *'
+  pull_request:
+    branches:
+      - main
 
 jobs:
 
