@@ -39,10 +39,8 @@ jobs:
 
       - name: Execute evaluation script
         env:
-          YEAR: "${{ steps.current-time.outputs.year }}"
-          MONTH: "${{ steps.current-time.outputs.month }}"
-          DAY: "${{ steps.current-time.outputs.day }}"
+          END_DATE: "${{ steps.current-time.outputs.time }}"
           HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
           HF_AUTONLP_BACKEND_API: ${{ secrets.HF_AUTONLP_BACKEND_API }}
         run: |
-          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft ought/raft-private-labels $YEAR-$MONTH-$DAY 7
+          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft ought/raft-private-labels $END_DATE 7
