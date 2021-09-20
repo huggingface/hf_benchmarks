@@ -53,7 +53,6 @@ def get_benchmark_repos(
     repo_type: str = "prediction",
     start_date: Union[str, pd.Timestamp] = None,
     end_date: Union[str, pd.Timestamp] = None,
-    previous_days: int = None,
 ) -> List[Dict]:
     """Gets the metadata associated with benchmark submission and evaluation repositories.
 
@@ -64,7 +63,6 @@ def get_benchmark_repos(
         repo_type: The type of benchmark repository. Can be `prediction`, `model` or `evaluation`.
         start_date: The timestamp for the start of the submission window.
         end_date: The timestamp for the end of the submission window.
-        previous_days: The number of days to look back for previous submissions.
 
     Returns:
         The benchmark repositories' metadata of a given `repo_type`.
@@ -85,9 +83,6 @@ def get_benchmark_repos(
 
     # Filter for repos that fall within submission window
     if start_date and end_date:
-        repos = [repo for repo in repos if is_time_between(start_date, end_date, repo.get("lastModified"))]
-    elif end_date and previous_days:
-        start_date = pd.to_datetime(end_date) - pd.Timedelta(days=previous_days)
         repos = [repo for repo in repos if is_time_between(start_date, end_date, repo.get("lastModified"))]
 
     for repo in repos:
