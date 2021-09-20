@@ -41,12 +41,11 @@ jobs:
           YEAR: "${{ steps.current-time.outputs.year }}"
           MONTH: "${{ steps.current-time.outputs.month }}"
           DAY: "${{ steps.current-time.outputs.day }}"
-          END_DATE: $YEAR-$MONTH-$DAY
-        run: echo $END_DATE
+        run: echo $YEAR-$MONTH-$DAY
 
       - name: Execute evaluation script
         env:
           HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
           HF_AUTONLP_BACKEND_API: ${{ secrets.HF_AUTONLP_BACKEND_API }}
         run: |
-          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft ought/raft $END_DATE 7
+          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft ought/raft-private-labels $YEAR-$MONTH-$DAY 7
