@@ -92,8 +92,8 @@ class GetBenchmarkReposTest(TestCase):
             benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
         )
         submission_time = pd.to_datetime(repo[0].get("lastModified"))
-        start_date = str((submission_time - pd.Timedelta(days=1)).date())
-        end_date = str((submission_time + pd.Timedelta(days=1)).date())
+        start_date = (submission_time - pd.Timedelta(days=1)).date()
+        end_date = (submission_time + pd.Timedelta(days=1)).date()
         data = get_benchmark_repos(
             benchmark=DUMMY_BENCHMARK_NAME,
             use_auth_token=True,
@@ -112,8 +112,8 @@ class GetBenchmarkReposTest(TestCase):
             benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
         )
         submission_time = pd.to_datetime(repo[0].get("lastModified"))
-        start_date = str((submission_time + pd.Timedelta(days=1)).date())
-        end_date = str((submission_time + pd.Timedelta(days=2)).date())
+        start_date = (submission_time + pd.Timedelta(days=1)).date()
+        end_date = (submission_time + pd.Timedelta(days=2)).date()
         data = get_benchmark_repos(
             benchmark=DUMMY_BENCHMARK_NAME,
             use_auth_token=True,

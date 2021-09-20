@@ -51,8 +51,8 @@ def get_benchmark_repos(
     use_auth_token: Union[bool, str, None] = None,
     endpoint: str = "datasets",
     repo_type: str = "prediction",
-    start_date: str = None,
-    end_date: str = None,
+    start_date: Union[str, pd.Timestamp] = None,
+    end_date: Union[str, pd.Timestamp] = None,
 ) -> List[Dict]:
     """Gets the metadata associated with benchmark submission and evaluation repositories.
 

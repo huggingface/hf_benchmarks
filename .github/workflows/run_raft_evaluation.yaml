@@ -2,7 +2,7 @@ name: Run RAFT evaluation
 
 on:
   schedule:
-    - cron:  '0 */60 * * *'
+    - cron:  '0 0 * * SUN' # Run evaluation at midnight every Sunday
 
 jobs:
 
@@ -27,9 +27,19 @@ jobs:
         run: |
           autonlp login --api-key $HF_HUB_TOKEN
 
+      - name: Get current date
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYYMMDD-HH
+          utcOffset: "+08:00"
+
       - name: Execute evaluation script
         env:
+          YEAR: "${{ steps.current-time.outputs.year }}"
+          MONTH: "${{ steps.current-time.outputs.month }}"
+          DAY: "${{ steps.current-time.outputs.day }}"
           HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
           HF_AUTONLP_BACKEND_API: ${{ secrets.HF_AUTONLP_BACKEND_API }}
         run: |
-          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft ought/raft
+          HF_HUB_TOKEN=$HF_HUB_TOKEN HF_AUTONLP_BACKEND_API=$HF_AUTONLP_BACKEND_API python scripts/run_evaluation.py raft ought/raft-private-labels $YEAR-$MONTH-$DAY 7
