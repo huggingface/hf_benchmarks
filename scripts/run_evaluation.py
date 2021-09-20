@@ -23,9 +23,7 @@ app = typer.Typer()
 def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: int):
     start_date = pd.to_datetime(end_date) - pd.Timedelta(days=previous_days)
     typer.echo(f"Evaluating submissions on benchmark {benchmark} from {start_date} to {end_date}")
-    submissions = get_benchmark_repos(
-        benchmark, use_auth_token=auth_token, start_date=start_date, end_date=end_date
-    )
+    submissions = get_benchmark_repos(benchmark, use_auth_token=auth_token, start_date=start_date, end_date=end_date)
     typer.echo(f"Found {len(submissions)} submissions to evaluate on benchmark {benchmark}")
     header = {"Authorization": f"Bearer {auth_token}"}
     for submission in submissions:
