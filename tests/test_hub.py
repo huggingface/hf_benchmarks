@@ -92,8 +92,8 @@ class GetBenchmarkReposTest(TestCase):
             benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
         )
         submission_time = pd.to_datetime(repo[0].get("lastModified"))
-        start_date = str((submission_time - pd.Timedelta(days=1)).date())
-        end_date = str((submission_time + pd.Timedelta(days=1)).date())
+        start_date = (submission_time - pd.Timedelta(days=1)).date()
+        end_date = (submission_time + pd.Timedelta(days=1)).date()
         data = get_benchmark_repos(
             benchmark=DUMMY_BENCHMARK_NAME,
             use_auth_token=True,
@@ -112,8 +112,8 @@ class GetBenchmarkReposTest(TestCase):
             benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
         )
         submission_time = pd.to_datetime(repo[0].get("lastModified"))
-        start_date = str((submission_time + pd.Timedelta(days=1)).date())
-        end_date = str((submission_time + pd.Timedelta(days=2)).date())
+        start_date = (submission_time + pd.Timedelta(days=1)).date()
+        end_date = (submission_time + pd.Timedelta(days=2)).date()
         data = get_benchmark_repos(
             benchmark=DUMMY_BENCHMARK_NAME,
             use_auth_token=True,
@@ -121,5 +121,44 @@ class GetBenchmarkReposTest(TestCase):
             repo_type="prediction",
             start_date=start_date,
             end_date=end_date,
+        )
+        self.assertEqual(len(data), 0)
+
+    def test_repo_in_previous_days(self):
+        # Grab repo to extract timestamp
+        # TODO(lewtun): Use HfApi.dataset_info if we bump huggingface-hub in AutoNLP backend
+        repo = get_benchmark_repos(
+            benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
+        )
+        submission_time = pd.to_datetime(repo[0].get("lastModified"))
+        end_date = (submission_time + pd.Timedelta(days=1)).date()
+        previous_days = 7
+        data = get_benchmark_repos(
+            benchmark=DUMMY_BENCHMARK_NAME,
+            use_auth_token=True,
+            endpoint="datasets",
+            repo_type="prediction",
+            end_date=end_date,
+            previous_days=previous_days,
+        )
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["id"], DUMMY_PREDICTION_ID)
+
+    def test_repo_outside_previous_days(self):
+        # Grab repo to extract timestamp
+        # TODO(lewtun): Use HfApi.dataset_info if we bump huggingface-hub in AutoNLP backend
+        repo = get_benchmark_repos(
+            benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
+        )
+        submission_time = pd.to_datetime(repo[0].get("lastModified"))
+        end_date = (submission_time - pd.Timedelta(days=1)).date()
+        previous_days = 7
+        data = get_benchmark_repos(
+            benchmark=DUMMY_BENCHMARK_NAME,
+            use_auth_token=True,
+            endpoint="datasets",
+            repo_type="prediction",
+            end_date=end_date,
+            previous_days=previous_days,
         )
         self.assertEqual(len(data), 0)
