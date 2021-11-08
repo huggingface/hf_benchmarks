@@ -28,6 +28,7 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
     header = {"Authorization": f"Bearer {auth_token}"}
     for submission in submissions:
         submission_dataset = submission["id"]
+        typer.echo(f"Evaluating submission {submission_dataset}")
         response = requests.get(
             f"http://huggingface.co/api/datasets/{submission_dataset}?full=true",
             headers=header,
