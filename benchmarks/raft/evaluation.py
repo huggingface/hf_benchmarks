@@ -3,7 +3,7 @@ from datasets import get_dataset_config_names, load_dataset, load_metric
 from evaluate import Evaluation, Metric, Result, Task
 
 
-def evaluate(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> Evaluation:
+def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> Evaluation:
     """Computes metrics for a benchmark.
 
     Args:
