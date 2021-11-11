@@ -34,4 +34,5 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
         with open(metrics_filename, "r") as f:
             metrics = json.load(f)
 
+    # TODO (lewtun): Define conversion to YAML format.
     return metrics
