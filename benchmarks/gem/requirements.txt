@@ -1,0 +1,2 @@
+gem-metrics @ git+https://github.com/lewtun/GEM-metrics.git@use_hf_hub_references
+huggingface-hub==0.2.1
