@@ -1,7 +1,7 @@
 import json
 import subprocess
 
-from huggingface_hub import cached_download, hf_hub_url, list_repo_files
+from huggingface_hub import cached_download, hf_hub_url, list_repo_files # type: ignore
 
 
 def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> dict:
@@ -13,7 +13,7 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
         use_auth_token (:obj:`str`): The API token to access your private dataset on the Hugging Face Hub.
 
     Returns:
-        evaluation (:obj:`Evaluation`): The evaluation metrics.
+        evaluation (:obj:`dict`): The evaluation metrics.
     """
     metrics_filename = "metrics.json"
 
