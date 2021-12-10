@@ -1,7 +1,7 @@
 import json
 import subprocess
 
-from huggingface_hub import cached_download, hf_hub_url # type: ignore
+from huggingface_hub import cached_download, hf_hub_url  # type: ignore
 
 
 def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> dict:
