@@ -1,10 +1,11 @@
 import json
 import subprocess
+from typing import List
 
 from huggingface_hub import cached_download, hf_hub_url  # type: ignore
 
 
-def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> dict:
+def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> List[dict]:
     """Computes metrics for a benchmark.
 
     Args:
@@ -13,7 +14,7 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
         use_auth_token (:obj:`str`): The API token to access your private dataset on the Hugging Face Hub.
 
     Returns:
-        evaluation (:obj:`Evaluation`): The evaluation metrics.
+        metrics (:obj:`List[dict]`): The evaluation metrics.
     """
     metrics_filename = "metrics.json"
     # This assumes that the GEM submissions are a single file, with a predefined name
@@ -33,4 +34,4 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
         with open(metrics_filename, "r") as f:
             metrics = json.load(f)
 
-    return metrics
+    return [metrics]
