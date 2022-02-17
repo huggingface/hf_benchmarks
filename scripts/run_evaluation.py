@@ -38,7 +38,7 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
         tags = extract_tags(data)
         # Extract submission timestamp and convert to Unix epoch in nanoseconds
         timestamp = pd.to_datetime(data["lastModified"])
-        submission_timestamp = int(timestamp.timestamp() * 10 ** 9)
+        submission_timestamp = int(timestamp.timestamp() * 10**9)
         # Use the user-generated submission name, Git commit SHA and timestamp to create submission ID
         submission_id = tags["submission_name"] + "__" + data["sha"] + "__" + str(submission_timestamp)
         process = subprocess.run(
