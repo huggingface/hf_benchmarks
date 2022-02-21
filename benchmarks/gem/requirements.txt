@@ -1,2 +1,2 @@
 datasets==1.17.0 # DO NOT CHANGE!
-gem-metrics @ git+https://github.com/lewtun/GEM-metrics.git
+gem-metrics @ git+https://github.com/GEM-benchmark/GEM-metrics
