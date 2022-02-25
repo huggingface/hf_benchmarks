@@ -19,7 +19,7 @@ jobs:
           python-version: 3.8
 
       - name: Install requirements
-        run: pip install '.[cron]'
+        run: pip install '.[cron-gem]'
 
       - name: Execute scoring script
         env:
