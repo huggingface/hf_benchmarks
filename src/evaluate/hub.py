@@ -96,3 +96,30 @@ def get_benchmark_repos(
             submissions.append(repo)
 
     return submissions
+
+
+def download_submissions(header):
+    response = requests.get("http://huggingface.co/api/datasets", headers=header)
+    all_datasets = response.json()
+    submissions = []
+
+    for dataset in all_datasets:
+        tags = extract_tags(dataset)
+        if tags.get("benchmark") == "gem" and tags.get("type") == "evaluation":
+            submissions.append(dataset)
+    return submissions
+
+
+def format_submissions(submissions, header):
+    all_scores = []
+    for idx, submission in enumerate(submissions):
+        submission_id = submission["id"]
+        response = requests.get(
+            f"http://huggingface.co/api/datasets/{submission_id}?full=true",
+            headers=header,
+        )
+        data = response.json()
+        card_data = data["cardData"]
+        scores = card_data["model-index"][0]
+        all_scores.append(scores)
+    return all_scores

@@ -1,0 +1,28 @@
+name: Update GEM scores
+
+on:
+  schedule:
+    - cron:  '0 * * * *' # Update score every hour
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Python Environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install requirements
+        run: pip install '.[cron]'
+
+      - name: Execute scoring script
+        env:
+          HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
+        run: |
+          HF_HUB_TOKEN=$HF_HUB_TOKEN python scripts/run_gem_scoring.py
