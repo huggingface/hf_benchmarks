@@ -69,8 +69,9 @@ def combine_requirements(base_keys):
 
 
 EXTRAS_REQUIRE["dev"] = combine_requirements([k for k in EXTRAS_REQUIRE])
-
+# TODO(lewtun): replace autonlp CLI with HTTP request ot avoid this dep
 EXTRAS_REQUIRE["cron"] = ["autonlp>=0.3.4", "requests"]
+EXTRAS_REQUIRE["cron-gem"] = ["requests"]
 
 benchmark_dependencies = list(Path("benchmarks/").glob("**/requirements.txt"))
 for benchmark in benchmark_dependencies:
