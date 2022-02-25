@@ -1,12 +1,8 @@
 name: Update GEM scores
 
-# on:
-#   schedule:
-#     - cron:  '0 * * * *' # Update score every hour
 on:
-  push:
-    branches:
-      - main
+  schedule:
+    - cron:  '0 * * * *' # Update score every hour
 
 jobs:
 
