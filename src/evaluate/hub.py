@@ -98,14 +98,6 @@ def get_benchmark_repos(
     return submissions
 
 
-def extract_tags(dataset):
-    tags = {}
-    for tag in dataset["tags"]:
-        k, v = tuple(tag.split(":", 1))
-        tags[k] = v
-    return tags
-
-
 def download_submissions(header):
     response = requests.get("http://huggingface.co/api/datasets", headers=header)
     all_datasets = response.json()
