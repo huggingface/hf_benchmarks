@@ -75,20 +75,21 @@ def filter_submission_output(submission_scores: dict, eval_config_path: str):
 
 @app.command()
 def run():
+    # Download submission metadata from the Hub
     hub_submissions = download_submissions(header)
     # Filter out the test submissions
     hub_submissions = [sub for sub in hub_submissions if "lewtun" not in sub["id"]]
-
+    # Download the submission from v1 of the GEM benchmark
     gem_v1_url = hf_hub_url("GEM/v1-outputs-and-scores", filename="gem-v1-outputs-and-scores.zip", repo_type="dataset")
     gem_v1_path = cached_download(gem_v1_url)
-
+    # Load the submissions from v1
     with zipfile.ZipFile(gem_v1_path) as zf:
         zf.extractall("data")
 
     gem_v1_files = [p for p in Path(GEM_V1_PATH).glob("*.scores.json")]
     gem_v1_submissions = [load_json(p) for p in gem_v1_files]
-    typer.echo(f"Number of V1 subs: {len(gem_v1_submissions)}")
-
+    typer.echo(f"Number of submissions from version 1 of the benchmark: {len(gem_v1_submissions)}")
+    # Some fields have NaNs which breaks the frontend - replace with -999 as a workaround
     gem_v1_scores = []
     for scores in gem_v1_submissions:
         for k, v in scores.items():
@@ -97,11 +98,16 @@ def run():
                     if "msttr" in kk and np.isnan(vv):
                         scores[k][kk] = -999
         gem_v1_scores.append(scores)
-
+    # Download scores from Hub and combine with v1 scores
     all_scores = format_submissions(hub_submissions, header)
     all_scores.extend(gem_v1_scores)
-    typer.echo(f"All scores {len(all_scores)}")
-
+    typer.echo(f"Number of raw scores: {len(all_scores)}")
+    # Filter the scores for smaller payload to the website / Spaces
+    filtered_scores = filter_submission_output(all_scores, EVAL_CONFIG_PATH)
+    typer.echo(f"Number of filtered scores: {len(filtered_scores)}")
+    if len(all_scores) != len(filtered_scores):
+        raise ValueError("The raw and filtered scores must have the same count!")
+    # Clone the Hub repo with the scores
     repo = Repository(
         local_dir=LOCAL_SCORES_REPO,
         clone_from=SCORES_REPO_URL,
@@ -109,10 +115,7 @@ def run():
         private=False,
         use_auth_token=auth_token,
     )
-
-    filtered_scores = filter_submission_output(all_scores, EVAL_CONFIG_PATH)
-    typer.echo(f"Filtered scores {len(filtered_scores)}")
-
+    # Save and update the raw and filtered scores
     save_json(f"{LOCAL_SCORES_REPO}/scores.json", all_scores)
     save_json(f"{LOCAL_SCORES_REPO}/filtered_scores.json", filtered_scores)
 
