@@ -76,7 +76,7 @@ def filter_submission_output(submission_scores: dict, eval_config_path: str):
 @app.command()
 def run():
     hub_submissions = download_submissions(header)
-    # Filter
+    # Filter out the test submissions
     hub_submissions = [sub for sub in hub_submissions if "lewtun" not in sub["id"]]
 
     gem_v1_url = hf_hub_url("GEM/v1-outputs-and-scores", filename="gem-v1-outputs-and-scores.zip", repo_type="dataset")
