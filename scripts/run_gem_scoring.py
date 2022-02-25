@@ -1,9 +1,9 @@
-import json
 import os
 import zipfile
 from pathlib import Path
 
 import numpy as np
+import requests
 import typer
 from dotenv import load_dotenv
 from huggingface_hub import Repository, cached_download, hf_hub_url
@@ -20,7 +20,10 @@ header = {"Authorization": "Bearer " + auth_token}
 SCORES_REPO_URL = "https://huggingface.co/datasets/GEM-submissions/submission-scores"
 LOCAL_SCORES_REPO = "data/submission-scores"
 GEM_V1_PATH = "data/gem-v1-outputs-and-scores"
-EVAL_CONFIG_PATH = f"{LOCAL_SCORES_REPO}/eval_config.json"
+# This file is used to configure the filtering of the raw submissions and also used to configure the GEM website
+EVAL_CONFIG_URL = (
+    "https://raw.githubusercontent.com/GEM-benchmark/GEM-benchmark.github.io/main/web/results/eval_config.json"
+)
 
 app = typer.Typer()
 
@@ -65,9 +68,7 @@ def round_results(submission_scores: dict):
     return submission_scores
 
 
-def filter_submission_output(submission_scores: dict, eval_config_path: str):
-    with open(eval_config_path, "r", encoding="utf-8") as f:
-        config = json.load(f)
+def filter_submission_output(submission_scores: dict, config: dict):
     relevant_metrics = extract_relevant_metrics(config)
     filtered_scores = [drop_unnecessary_metrics(d, relevant_metrics) for d in submission_scores]
     return [round_results(d) for d in filtered_scores]
@@ -111,7 +112,8 @@ def run():
         use_auth_token=auth_token,
     )
     # Filter the scores for smaller payload to the website / Spaces
-    filtered_scores = filter_submission_output(all_scores, EVAL_CONFIG_PATH)
+    eval_config = requests.get(EVAL_CONFIG_URL).json()
+    filtered_scores = filter_submission_output(all_scores, eval_config)
     typer.echo(f"Number of filtered scores: {len(filtered_scores)}")
     if len(all_scores) != len(filtered_scores):
         raise ValueError("The raw and filtered scores must have the same count!")
