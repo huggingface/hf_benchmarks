@@ -102,11 +102,6 @@ def run():
     all_scores = format_submissions(hub_submissions, header)
     all_scores.extend(gem_v1_scores)
     typer.echo(f"Number of raw scores: {len(all_scores)}")
-    # Filter the scores for smaller payload to the website / Spaces
-    filtered_scores = filter_submission_output(all_scores, EVAL_CONFIG_PATH)
-    typer.echo(f"Number of filtered scores: {len(filtered_scores)}")
-    if len(all_scores) != len(filtered_scores):
-        raise ValueError("The raw and filtered scores must have the same count!")
     # Clone the Hub repo with the scores
     repo = Repository(
         local_dir=LOCAL_SCORES_REPO,
@@ -115,6 +110,11 @@ def run():
         private=False,
         use_auth_token=auth_token,
     )
+    # Filter the scores for smaller payload to the website / Spaces
+    filtered_scores = filter_submission_output(all_scores, EVAL_CONFIG_PATH)
+    typer.echo(f"Number of filtered scores: {len(filtered_scores)}")
+    if len(all_scores) != len(filtered_scores):
+        raise ValueError("The raw and filtered scores must have the same count!")
     # Save and update the raw and filtered scores
     save_json(f"{LOCAL_SCORES_REPO}/scores.json", all_scores)
     save_json(f"{LOCAL_SCORES_REPO}/filtered_scores.json", filtered_scores)
