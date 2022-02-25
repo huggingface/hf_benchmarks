@@ -21,11 +21,8 @@ jobs:
       - name: Install requirements
         run: pip install '.[cron]'
 
-      - name: Execute evaluation script
+      - name: Execute scoring script
         env:
-          YEAR: "${{ steps.current-time.outputs.year }}"
-          MONTH: "${{ steps.current-time.outputs.month }}"
-          DAY: "${{ steps.current-time.outputs.day }}"
           HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
         run: |
           HF_HUB_TOKEN=$HF_HUB_TOKEN python scripts/run_gem_scoring.py
