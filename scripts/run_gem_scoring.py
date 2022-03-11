@@ -18,7 +18,9 @@ auth_token = os.getenv("HF_HUB_TOKEN")
 header = {"Authorization": "Bearer " + auth_token}
 
 SCORES_REPO_URL = "https://huggingface.co/datasets/GEM-submissions/submission-scores"
+OUTPUTS_REPO_URL = "https://huggingface.co/datasets/GEM-submissions/outputs-and-scores"
 LOCAL_SCORES_REPO = "data/submission-scores"
+LOCAL_OUTPUTS_REPO = "data/outputs-and-scores"
 GEM_V1_PATH = "data/gem-v1-outputs-and-scores"
 # This file is used to configure the filtering of the raw submissions and also used to configure the GEM website
 EVAL_CONFIG_URL = (
@@ -81,7 +83,9 @@ def run():
     # Filter out the test submissions
     hub_submissions = [sub for sub in hub_submissions if "lewtun" not in sub["id"]]
     # Download the submission from v1 of the GEM benchmark
-    gem_v1_url = hf_hub_url("GEM/v1-outputs-and-scores", filename="gem-v1-outputs-and-scores.zip", repo_type="dataset")
+    gem_v1_url = hf_hub_url(
+        "GEM-submissions/v1-outputs-and-scores", filename="gem-v1-outputs-and-scores.zip", repo_type="dataset"
+    )
     gem_v1_path = cached_download(gem_v1_url)
     # Load the submissions from v1
     with zipfile.ZipFile(gem_v1_path) as zf:
@@ -108,7 +112,6 @@ def run():
         local_dir=LOCAL_SCORES_REPO,
         clone_from=SCORES_REPO_URL,
         repo_type="dataset",
-        private=False,
         use_auth_token=auth_token,
     )
     # Filter the scores for smaller payload to the website / Spaces
