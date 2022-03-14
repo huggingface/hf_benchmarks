@@ -129,6 +129,7 @@ def run():
         typer.echo("No new submissions were found! Skipping update to the scores repo ...")
     else:
         scores_repo.git_add()
+        typer.echo("Pushing scores and outputs to the hub ...")
         scores_repo.push_to_hub("Update submission scores")
 
     # Dumping all scores and outputs - refactor this!
@@ -156,7 +157,7 @@ def run():
         gem_v2_scores_files.append(Path(f"data/tmp/{submission_name}.scores.json"))
         save_json(filename, score)
 
-    gem_v2_outputs = get_benchmark_repos("gem", use_auth_token=header)
+    gem_v2_outputs = get_benchmark_repos("gem", use_auth_token=auth_token)
     gem_v2_outputs = [s for s in gem_v2_outputs if "lewtun" not in s["id"]]
     gem_v2_outputs_files = []
 
@@ -184,6 +185,7 @@ def run():
         typer.echo("No new outputs were found! Skipping update to the outputs repo ...")
     else:
         outputs_repo.git_add()
+        typer.echo("Pushing scores and outputs to the hub ...")
         outputs_repo.push_to_hub("Update scores and outputs")
 
     # Flush local repos
