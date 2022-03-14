@@ -1,4 +1,5 @@
 import os
+import shutil
 import zipfile
 from pathlib import Path
 
@@ -8,7 +9,7 @@ import typer
 from dotenv import load_dotenv
 from huggingface_hub import Repository, cached_download, hf_hub_url
 
-from evaluate import download_submissions, format_submissions, load_json, save_json
+from evaluate import download_submissions, extract_tags, format_submissions, get_benchmark_repos, load_json, save_json
 
 
 if Path(".env").is_file():
@@ -18,10 +19,10 @@ auth_token = os.getenv("HF_HUB_TOKEN")
 header = {"Authorization": "Bearer " + auth_token}
 
 SCORES_REPO_URL = "https://huggingface.co/datasets/GEM-submissions/submission-scores"
-OUTPUTS_REPO_URL = "https://huggingface.co/datasets/GEM-submissions/outputs-and-scores"
+OUTPUTS_REPO_URL = "https://huggingface.co/datasets/GEM-submissions/v2-outputs-and-scores"
 LOCAL_SCORES_REPO = "data/submission-scores"
-LOCAL_OUTPUTS_REPO = "data/outputs-and-scores"
-GEM_V1_PATH = "data/gem-v1-outputs-and-scores"
+LOCAL_OUTPUTS_REPO = "data/v2-outputs-and-scores"
+LOCAL_GEM_V1_PATH = "data/gem-v1-outputs-and-scores"
 # This file is used to configure the filtering of the raw submissions and also used to configure the GEM website
 EVAL_CONFIG_URL = (
     "https://raw.githubusercontent.com/GEM-benchmark/GEM-benchmark.github.io/main/web/results/eval_config.json"
@@ -91,7 +92,7 @@ def run():
     with zipfile.ZipFile(gem_v1_path) as zf:
         zf.extractall("data")
 
-    gem_v1_files = [p for p in Path(GEM_V1_PATH).glob("*.scores.json")]
+    gem_v1_files = [p for p in Path(LOCAL_GEM_V1_PATH).glob("*.scores.json")]
     gem_v1_submissions = [load_json(p) for p in gem_v1_files]
     typer.echo(f"Number of submissions from version 1 of the benchmark: {len(gem_v1_submissions)}")
     # Some fields have NaNs which breaks the frontend - replace with -999 as a workaround
@@ -108,7 +109,7 @@ def run():
     all_scores.extend(gem_v1_scores)
     typer.echo(f"Number of raw scores: {len(all_scores)}")
     # Clone the Hub repo with the scores
-    repo = Repository(
+    scores_repo = Repository(
         local_dir=LOCAL_SCORES_REPO,
         clone_from=SCORES_REPO_URL,
         repo_type="dataset",
@@ -124,11 +125,70 @@ def run():
     save_json(f"{LOCAL_SCORES_REPO}/scores.json", all_scores)
     save_json(f"{LOCAL_SCORES_REPO}/filtered_scores.json", filtered_scores)
 
-    if repo.is_repo_clean():
+    if scores_repo.is_repo_clean():
         typer.echo("No new submissions were found! Skipping update to the scores repo ...")
     else:
-        repo.git_add()
-        repo.push_to_hub("Update submission scores")
+        scores_repo.git_add()
+        scores_repo.push_to_hub("Update submission scores")
+
+    # Dumping all scores and outputs - refactor this!
+    # Clone the Hub repo with the scores
+    outputs_repo = Repository(
+        local_dir=LOCAL_OUTPUTS_REPO,
+        clone_from=OUTPUTS_REPO_URL,
+        repo_type="dataset",
+        use_auth_token=auth_token,
+    )
+
+    # Load the submissions from v1
+    gem_v1_scores_files = [p for p in Path(LOCAL_GEM_V1_PATH).glob("*.scores.json")]
+    gem_v1_outputs_files = [p for p in Path(LOCAL_GEM_V1_PATH).glob("*.outputs.json")]
+
+    hub_submissions = download_submissions(header)
+    hub_submissions = [sub for sub in hub_submissions if "lewtun" not in sub["id"]]
+    gem_v2_scores = format_submissions(hub_submissions, header)
+    scores_submission_names = []
+    gem_v2_scores_files = []
+    for score in gem_v2_scores:
+        submission_name = score["submission_name"]
+        scores_submission_names.append(submission_name)
+        filename = f"data/tmp/{submission_name}.scores.json"
+        gem_v2_scores_files.append(Path(f"data/tmp/{submission_name}.scores.json"))
+        save_json(filename, score)
+
+    gem_v2_outputs = get_benchmark_repos("gem", use_auth_token=header)
+    gem_v2_outputs = [s for s in gem_v2_outputs if "lewtun" not in s["id"]]
+    gem_v2_outputs_files = []
+
+    for submission in gem_v2_outputs:
+        tags = extract_tags(submission)
+        submission_name = tags["submission_name"]
+        if submission_name in scores_submission_names:
+            url = hf_hub_url(submission["id"], "submission.json", repo_type="dataset")
+            cache_filepath = cached_download(
+                url, cache_dir="data/tmp/", force_filename=f"{submission_name}.outputs.json"
+            )
+            gem_v2_outputs_files.append(Path(cache_filepath))
+
+    with zipfile.ZipFile(f"{LOCAL_OUTPUTS_REPO}/gem-v2-outputs-and-scores.zip", "w") as f:
+        for path in gem_v1_scores_files:
+            f.write(path, path.relative_to("data/gem-v1-outputs-and-scores"), compress_type=zipfile.ZIP_DEFLATED)
+        for path in gem_v1_outputs_files:
+            f.write(path, path.relative_to("data/gem-v1-outputs-and-scores"), compress_type=zipfile.ZIP_DEFLATED)
+        for path in gem_v2_outputs_files:
+            f.write(path, path.relative_to("data/tmp"), compress_type=zipfile.ZIP_DEFLATED)
+        for path in gem_v2_scores_files:
+            f.write(path, path.relative_to("data/tmp"), compress_type=zipfile.ZIP_DEFLATED)
+
+    if outputs_repo.is_repo_clean():
+        typer.echo("No new outputs were found! Skipping update to the outputs repo ...")
+    else:
+        outputs_repo.git_add()
+        outputs_repo.push_to_hub("Update scores and outputs")
+
+    # Flush local repos
+    shutil.rmtree(LOCAL_SCORES_REPO, ignore_errors=True)
+    shutil.rmtree(LOCAL_OUTPUTS_REPO, ignore_errors=True)
 
 
 if __name__ == "__main__":
