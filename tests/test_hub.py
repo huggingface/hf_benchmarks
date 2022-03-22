@@ -4,7 +4,7 @@ from unittest import TestCase
 import pandas as pd
 from huggingface_hub import HfFolder
 
-from evaluate import extract_tags, get_benchmark_repos
+from hf_benchmarks import extract_tags, get_benchmark_repos
 
 from .testing_utils import (
     BOGUS_BENCHMARK_NAME,

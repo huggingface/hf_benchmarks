@@ -10,8 +10,8 @@ on:
 
 jobs:
 
-  test_evaluate:
-    name: Test evaluate
+  test_library:
+    name: Test library
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

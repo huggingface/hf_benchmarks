@@ -1,5 +1,5 @@
 # Lint as: python3
-""" HuggingFace/Evaluate is an open-source library for evaluating machine learning benchmarks.
+""" Hugging Face Benchmarks is an open-source library for evaluating machine learning benchmarks.
 
 Note:
 
@@ -80,14 +80,14 @@ for benchmark in benchmark_dependencies:
         EXTRAS_REQUIRE[benchmark.parent.name] = deps
 
 setup(
-    name="evaluate",
+    name="hf_benchmarks",
     version="0.0.1",
     description=DOCLINES[0],
     long_description="\n".join(DOCLINES[2:]),
     author="HuggingFace Inc.",
     author_email="lewis@huggingface.co",
-    url="https://github.com/huggingface/evaluate",
-    download_url="https://github.com/huggingface/evaluate/tags",
+    url="https://github.com/huggingface/hf_benchmarks",
+    download_url="https://github.com/huggingface/hf_benchmarks/tags",
     license="Apache 2.0",
     package_dir={"": "src"},
     packages=find_packages("src"),
