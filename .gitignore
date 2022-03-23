@@ -131,5 +131,5 @@ dmypy.json
 # mac OS
 .DS_Store
 
-# Evaluate settings
+# Repo settings
 data/

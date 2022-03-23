@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import typer
 
-from evaluate import get_benchmark_repos
+from hf_benchmarks import get_benchmark_repos
 
 
 app = typer.Typer()

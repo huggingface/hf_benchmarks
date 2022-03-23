@@ -9,7 +9,14 @@ import typer
 from dotenv import load_dotenv
 from huggingface_hub import Repository, cached_download, hf_hub_url
 
-from evaluate import download_submissions, extract_tags, format_submissions, get_benchmark_repos, load_json, save_json
+from hf_benchmarks import (
+    download_submissions,
+    extract_tags,
+    format_submissions,
+    get_benchmark_repos,
+    load_json,
+    save_json,
+)
 
 
 if Path(".env").is_file():

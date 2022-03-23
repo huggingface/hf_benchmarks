@@ -8,7 +8,7 @@ import requests
 import typer
 from dotenv import load_dotenv
 
-from evaluate import extract_tags, get_benchmark_repos
+from hf_benchmarks import extract_tags, get_benchmark_repos
 
 
 if Path(".env").is_file():
