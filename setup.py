@@ -55,7 +55,7 @@ from setuptools import find_packages, setup
 DOCLINES = __doc__.split("\n")
 
 # We must upper bound the datasets version to match that in the autonlp backend
-REQUIRED_PKGS = ["datasets<=1.17.0", "typer>=0.3.2", "python-dotenv>=0.18.0"]
+REQUIRED_PKGS = ["datasets<=1.17.0", "typer>=0.3.2", "click==8.0", "python-dotenv>=0.18.0"]
 
 QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1", "mypy", "types-requests"]
 
