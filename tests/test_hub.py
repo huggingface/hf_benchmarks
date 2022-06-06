@@ -48,7 +48,7 @@ class GetBenchmarkReposTest(TestCase):
         """
         Share this valid token in all tests below. Needed for CI
         """
-        token = os.getenv("HF_HUB_TOKEN")
+        token = os.getenv("HF_TOKEN")
         if token:
             HfFolder.save_token(token)
 
@@ -87,7 +87,7 @@ class GetBenchmarkReposTest(TestCase):
 
     def test_repo_in_submission_window(self):
         # Grab repo to extract timestamp
-        # TODO(lewtun): Use HfApi.dataset_info if we bump huggingface-hub in AutoNLP backend
+        # TODO(lewtun): Use HfApi.dataset_info if we bump huggingface-hub in AutoTrain backend
         repo = get_benchmark_repos(
             benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
         )
@@ -107,7 +107,7 @@ class GetBenchmarkReposTest(TestCase):
 
     def test_repo_outside_submission_window(self):
         # Grab repo to extract timestamp
-        # TODO(lewtun): Use HfApi.dataset_info if we bump huggingface-hub in AutoNLP backend
+        # TODO(lewtun): Use HfApi.dataset_info if we bump huggingface-hub in AutoTrain backend
         repo = get_benchmark_repos(
             benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
         )

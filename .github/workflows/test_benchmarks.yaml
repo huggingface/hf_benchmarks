@@ -26,7 +26,7 @@ jobs:
           python -m pip install ".[tests]"
       - name: Run unit tests
         env:
-          HF_HUB_TOKEN: ${{ secrets.HF_HUB_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: pytest
 
   check_code_quality:

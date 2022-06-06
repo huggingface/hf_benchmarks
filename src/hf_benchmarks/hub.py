@@ -123,3 +123,24 @@ def format_submissions(submissions, header):
         scores = card_data["model-index"][0]
         all_scores.append(scores)
     return all_scores
+
+
+def get_auth_headers(token: str, prefix: str = "autonlp"):
+    return {"Authorization": f"{prefix} {token}"}
+
+
+def http_post(
+    path: str,
+    token: str,
+    payload=None,
+    domain: str = None,
+) -> requests.Response:
+    """HTTP POST request to the AutoNLP API, raises UnreachableAPIError if the API cannot be reached"""
+    try:
+        response = requests.post(
+            url=domain + path, json=payload, headers=get_auth_headers(token=token), allow_redirects=True
+        )
+    except requests.exceptions.ConnectionError:
+        print("❌ Failed to reach AutoNLP API, check your internet connection")
+    response.raise_for_status()
+    return response

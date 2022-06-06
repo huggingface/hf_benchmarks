@@ -54,8 +54,8 @@ from setuptools import find_packages, setup
 
 DOCLINES = __doc__.split("\n")
 
-# We must upper bound the datasets version to match that in the autonlp backend
-REQUIRED_PKGS = ["datasets<=1.17.0", "typer>=0.3.2", "click==8.0", "python-dotenv>=0.18.0"]
+# We must upper bound the datasets version to match that in the AutoTrain backend
+REQUIRED_PKGS = ["datasets<=2.2", "typer>=0.3.2", "click==8.0", "python-dotenv>=0.18.0"]
 
 QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1", "mypy", "types-requests"]
 
@@ -69,9 +69,7 @@ def combine_requirements(base_keys):
 
 
 EXTRAS_REQUIRE["dev"] = combine_requirements([k for k in EXTRAS_REQUIRE])
-# TODO(lewtun): replace autonlp CLI with HTTP request ot avoid this dep
-EXTRAS_REQUIRE["cron"] = ["autonlp>=0.3.4", "requests"]
-EXTRAS_REQUIRE["cron-gem"] = ["requests"]
+EXTRAS_REQUIRE["cron"] = ["requests"]
 
 benchmark_dependencies = list(Path("benchmarks/").glob("**/requirements.txt"))
 for benchmark in benchmark_dependencies:
