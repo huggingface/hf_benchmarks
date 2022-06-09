@@ -13,7 +13,6 @@ if Path(".env").is_file():
     load_dotenv(".env")
 
 HF_TOKEN = os.getenv("HF_TOKEN")
-AUTOTRAIN_USERNAME = os.getenv("AUTOTRAIN_USERNAME")
 AUTOTRAIN_TOKEN = os.getenv("AUTOTRAIN_TOKEN")
 AUTOTRAIN_BACKEND_API = os.getenv("AUTOTRAIN_BACKEND_API")
 
@@ -44,7 +43,6 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
         submission_id = tags["submission_name"] + "__" + data["sha"] + "__" + str(submission_timestamp)
 
         payload = {
-            "username": AUTOTRAIN_USERNAME,
             "dataset": evaluation_dataset,
             "task": 1,
             "model": benchmark,
