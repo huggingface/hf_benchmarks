@@ -19,10 +19,10 @@ jobs:
           python-version: 3.8
 
       - name: Install requirements
-        run: pip install '.[cron-gem]'
+        run: pip install '.[cron]'
 
       - name: Execute scoring script
         env:
-          HF_HUB_TOKEN: ${{ secrets.HF_GEM_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_GEM_TOKEN }}
         run: |
-          HF_HUB_TOKEN=$HF_HUB_TOKEN python scripts/run_gem_scoring.py
+          HF_TOKEN=$HF_TOKEN python scripts/run_gem_scoring.py
