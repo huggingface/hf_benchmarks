@@ -1,3 +1,4 @@
+from curses import use_default_colors
 import os
 from pathlib import Path
 
@@ -5,6 +6,7 @@ import pandas as pd
 import requests
 import typer
 from dotenv import load_dotenv
+import uuid
 
 from hf_benchmarks import extract_tags, get_benchmark_repos, http_get, http_post
 
@@ -21,7 +23,7 @@ app = typer.Typer()
 
 
 @app.command()
-def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: int):
+def run(benchmark: str = "dummy", evaluation_dataset: str = "lewtun/benchmarks-private-label", end_date: str = "2022-06-22", previous_days: int = 7):
     start_date = pd.to_datetime(end_date) - pd.Timedelta(days=previous_days)
     typer.echo(f"Evaluating submissions on benchmark {benchmark} from {start_date} to {end_date}")
     submissions = get_benchmark_repos(benchmark, use_auth_token=HF_TOKEN, start_date=start_date, end_date=end_date)
@@ -43,7 +45,7 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
         timestamp = pd.to_datetime(data["lastModified"])
         submission_timestamp = int(timestamp.tz_localize(None).timestamp())
         # Use the user-generated submission name, Git commit SHA and timestamp to create submission ID
-        submission_id = submission_name + "__" + data["sha"][:6] + "__" + str(submission_timestamp)
+        submission_id = submission_name + "__" + uuid.uuid4()[:6] + "__" + str(submission_timestamp)
         # Define AutoTrain payload
         project_config = {}
         # Need a dummy dataset to use the dataset loader in AutoTrain
