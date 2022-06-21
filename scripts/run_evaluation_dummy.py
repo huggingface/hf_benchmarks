@@ -1,12 +1,11 @@
-from curses import use_default_colors
 import os
+import uuid
 from pathlib import Path
 
 import pandas as pd
 import requests
 import typer
 from dotenv import load_dotenv
-import uuid
 
 from hf_benchmarks import extract_tags, get_benchmark_repos, http_get, http_post
 
@@ -23,7 +22,12 @@ app = typer.Typer()
 
 
 @app.command()
-def run(benchmark: str = "dummy", evaluation_dataset: str = "lewtun/benchmarks-private-label", end_date: str = "2022-06-22", previous_days: int = 7):
+def run(
+    benchmark: str = "dummy",
+    evaluation_dataset: str = "lewtun/benchmarks-private-label",
+    end_date: str = "2022-06-22",
+    previous_days: int = 7,
+):
     start_date = pd.to_datetime(end_date) - pd.Timedelta(days=previous_days)
     typer.echo(f"Evaluating submissions on benchmark {benchmark} from {start_date} to {end_date}")
     submissions = get_benchmark_repos(benchmark, use_auth_token=HF_TOKEN, start_date=start_date, end_date=end_date)
