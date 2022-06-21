@@ -129,17 +129,26 @@ def get_auth_headers(token: str, prefix: str = "autonlp"):
     return {"Authorization": f"{prefix} {token}"}
 
 
-def http_post(
+def http_post(path: str, token: str, payload=None, domain: str = None, params=None) -> requests.Response:
+    """HTTP POST request to the AutoNLP API, raises UnreachableAPIError if the API cannot be reached"""
+    try:
+        response = requests.post(
+            url=domain + path, json=payload, headers=get_auth_headers(token=token), allow_redirects=True, params=params
+        )
+    except requests.exceptions.ConnectionError:
+        print("❌ Failed to reach AutoNLP API, check your internet connection")
+    response.raise_for_status()
+    return response
+
+
+def http_get(
     path: str,
     token: str,
-    payload=None,
     domain: str = None,
 ) -> requests.Response:
     """HTTP POST request to the AutoNLP API, raises UnreachableAPIError if the API cannot be reached"""
     try:
-        response = requests.post(
-            url=domain + path, json=payload, headers=get_auth_headers(token=token), allow_redirects=True
-        )
+        response = requests.get(url=domain + path, headers=get_auth_headers(token=token), allow_redirects=True)
     except requests.exceptions.ConnectionError:
         print("❌ Failed to reach AutoNLP API, check your internet connection")
     response.raise_for_status()
