@@ -55,7 +55,14 @@ from setuptools import find_packages, setup
 DOCLINES = __doc__.split("\n")
 
 # We must upper bound the datasets version to match that in the AutoTrain backend
-REQUIRED_PKGS = ["datasets<=2.2", "typer>=0.3.2", "click==8.0", "python-dotenv>=0.18.0"]
+REQUIRED_PKGS = [
+    "datasets<=2.2",
+    "typer>=0.3.2",
+    "click==8.0",
+    "python-dotenv>=0.18.0",
+    "evaluate==0.1.2",
+    "scikit-learn==1.1.1",
+]
 
 QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1", "mypy", "types-requests"]
 
