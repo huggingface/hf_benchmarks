@@ -11,7 +11,7 @@ from .testing_utils import (
     DUMMY_BENCHMARK_NAME,
     DUMMY_EVALUATION_ID,
     DUMMY_MODEL_ID,
-    DUMMY_PREDICTION_ID,
+    DUMMY_SUBMISSION_ID,
 )
 
 
@@ -69,7 +69,7 @@ class GetBenchmarkReposTest(TestCase):
             benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="prediction"
         )
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["id"], DUMMY_PREDICTION_ID)
+        self.assertEqual(data[0]["id"], DUMMY_SUBMISSION_ID)
 
     def test_evaluation_repo(self):
         data = get_benchmark_repos(
@@ -103,7 +103,7 @@ class GetBenchmarkReposTest(TestCase):
             end_date=end_date,
         )
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["id"], DUMMY_PREDICTION_ID)
+        self.assertEqual(data[0]["id"], DUMMY_SUBMISSION_ID)
 
     def test_repo_outside_submission_window(self):
         # Grab repo to extract timestamp

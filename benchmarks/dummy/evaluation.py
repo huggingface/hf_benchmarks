@@ -1,5 +1,5 @@
 from datasets import load_dataset
-from evaluate import load # type: ignore
+from evaluate import load  # type: ignore
 
 from hf_benchmarks import Evaluation, Metric, Result, Task
 
