@@ -27,6 +27,8 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     process = subprocess.run(
         ["gem_metrics", f"{submission_filepath}", "-o", f"{metrics_filename}"],
         stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=True,
     )
     if process.returncode == -1:
         raise ValueError(f"Error running gem_metrics for submission {submission_dataset} on {evaluation_dataset}!")

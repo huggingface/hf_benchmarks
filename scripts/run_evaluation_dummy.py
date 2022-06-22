@@ -24,7 +24,7 @@ app = typer.Typer()
 @app.command()
 def run(
     benchmark: str = "dummy",
-    evaluation_dataset: str = "lewtun/benchmarks-private-label",
+    evaluation_dataset: str = "lewtun/benchmarks-dummy-private-labels",
     end_date: str = "2022-06-22",
     previous_days: int = 7,
 ):
@@ -49,7 +49,7 @@ def run(
         timestamp = pd.to_datetime(data["lastModified"])
         submission_timestamp = int(timestamp.tz_localize(None).timestamp())
         # Use the user-generated submission name, Git commit SHA and timestamp to create submission ID
-        submission_id = submission_name + "__" + uuid.uuid4()[:6] + "__" + str(submission_timestamp)
+        submission_id = submission_name + "__" + str(uuid.uuid4())[:6] + "__" + str(submission_timestamp)
         # Define AutoTrain payload
         project_config = {}
         # Need a dummy dataset to use the dataset loader in AutoTrain
