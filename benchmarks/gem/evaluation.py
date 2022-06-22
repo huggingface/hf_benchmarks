@@ -16,6 +16,8 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     Returns:
         metrics (:obj:`List[dict]`): The evaluation metrics.
     """
+    # AutoTrain runs the evaluation job inside a Docker container, so we need to
+    # save the metrics in the root directory to avoid permission errors.
     metrics_filepath = "/app/metrics.json"
     # This assumes that the GEM submissions are a single file, with a predefined name
     # We'll need to enforce this on the submission repositories
