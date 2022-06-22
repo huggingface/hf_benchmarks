@@ -75,7 +75,6 @@ class GetBenchmarkReposTest(TestCase):
         data = get_benchmark_repos(
             benchmark=DUMMY_BENCHMARK_NAME, use_auth_token=True, endpoint="datasets", repo_type="evaluation"
         )
-        self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["id"], DUMMY_EVALUATION_ID)
 
     def test_model_upload_repo(self):
