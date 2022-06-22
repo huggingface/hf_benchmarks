@@ -16,7 +16,7 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     Returns:
         metrics (:obj:`List[dict]`): The evaluation metrics.
     """
-    metrics_filename = "metrics.json"
+    metrics_filepath = "/app/metrics.json"
     # This assumes that the GEM submissions are a single file, with a predefined name
     # We'll need to enforce this on the submission repositories
     submission_filename = "submission.json"
@@ -25,14 +25,12 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     submission_filepath = cached_download(submission_url, use_auth_token=use_auth_token)
     # gem_metrics automatically downloads the evaluation splits from the Hub
     process = subprocess.run(
-        ["sudo", "gem_metrics", f"{submission_filepath}", "-o", f"{metrics_filename}"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        ["gem_metrics", f"{submission_filepath}", "-o", f"{metrics_filepath}"], stdout=subprocess.PIPE
     )
     if process.returncode == -1:
         raise ValueError(f"Error running gem_metrics for submission {submission_dataset} on {evaluation_dataset}!")
     else:
-        with open(metrics_filename, "r") as f:
+        with open(metrics_filepath, "r") as f:
             metrics = json.load(f)
 
     return [metrics]
