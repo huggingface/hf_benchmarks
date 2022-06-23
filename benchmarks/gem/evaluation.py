@@ -2,7 +2,7 @@ import json
 import subprocess
 from typing import List
 
-from huggingface_hub import cached_download, hf_hub_url  # type: ignore
+from huggingface_hub import hf_hub_download  # type: ignore
 
 
 def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_token: str) -> List[dict]:
@@ -22,9 +22,9 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     # This assumes that the GEM submissions are a single file, with a predefined name
     # We'll need to enforce this on the submission repositories
     submission_filename = "submission.json"
-
-    submission_url = hf_hub_url(submission_dataset, submission_filename, repo_type="dataset")
-    submission_filepath = cached_download(submission_url, use_auth_token=use_auth_token)
+    submission_filepath = hf_hub_download(
+        repo_id=submission_dataset, filename=submission_filename, repo_type="dataset", use_auth_token=use_auth_token
+    )
     # gem_metrics automatically downloads the evaluation splits from the Hub
     process = subprocess.run(
         ["gem_metrics", f"{submission_filepath}", "-o", f"{metrics_filepath}"], stdout=subprocess.PIPE
