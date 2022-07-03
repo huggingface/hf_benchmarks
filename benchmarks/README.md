@@ -1,6 +1,10 @@
-## Adding a new benchmark for evaluation 
+# Hugging Face Benchmarks
 
-1. Copy the contents of the `common/` folder into a folder with your benchmark's name, e.g. `my_benchmark/`
-2. Edit:
-    * `my_benchmark/requirements.txt`
-    * `my_benchmark/evaluation.py`
+## AutoTrain configuration details
+
+Benchmarks are evaluated by AutoTrain, with the payload sent to the `AUTOTRAIN_BACKEND_API` environment variable. The current configuration for the hosted benchmarks is shown in the table below.
+
+| Benchmark |                  Backend API                   |
+|:---------:|:----------------------------------------------:|
+|   RAFT    | `https://api-staging.autotrain.huggingface.co` |
+|    GEM    | `https://api-staging.autotrain.huggingface.co` |
