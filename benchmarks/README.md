@@ -6,5 +6,5 @@ Benchmarks are evaluated by AutoTrain, with the payload sent to the `AUTOTRAIN_B
 
 | Benchmark |                  Backend API                   |
 |:---------:|:----------------------------------------------:|
-|   RAFT    | `https://api-staging.autotrain.huggingface.co` |
-|    GEM    | `https://api-staging.autotrain.huggingface.co` |
+|   RAFT    | `https://api.autotrain.huggingface.co` |
+|    GEM    | `https://api.autotrain.huggingface.co` |
