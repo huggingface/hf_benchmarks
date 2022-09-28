@@ -125,7 +125,7 @@ def format_submissions(submissions, header):
     return all_scores
 
 
-def get_auth_headers(token: str, prefix: str = "autonlp"):
+def get_auth_headers(token: str, prefix: str = "Bearer"):
     return {"Authorization": f"{prefix} {token}"}
 
 
