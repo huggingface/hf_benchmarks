@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -38,7 +39,10 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
         # Extract submission name from YAML tags
         tags = extract_tags(data)
         # Format submission name to comply with AutoTrain API
+        # _XXX_ for spaces, _DDD_ for double dashes
+        # TODO: remove these dirty hacks - should really apply validation at submission time!
         submission_name = tags["submission_name"].replace(" ", "_XXX_")
+        submission_name = submission_name.replace("--", "_DDD_")
         # Extract submission timestamp and convert to Unix epoch in nanoseconds
         timestamp = pd.to_datetime(data["lastModified"])
         submission_timestamp = int(timestamp.tz_localize(None).timestamp())
@@ -47,8 +51,8 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
         # Define AutoTrain payload
         project_config = {}
         # Need a dummy dataset to use the dataset loader in AutoTrain
-        project_config["dataset_name"] = "lewtun/imdb-dummy"
-        project_config["dataset_config"] = "lewtun--imdb-dummy"
+        project_config["dataset_name"] = "autoevaluator/benchmark-dummy-data"
+        project_config["dataset_config"] = "autoevaluator--benchmark-dummy-data"
         project_config["dataset_split"] = "train"
         project_config["col_mapping"] = {"text": "text", "label": "target"}
         # Specify benchmark parameters
@@ -65,8 +69,8 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
                 "language": "en",
                 "max_models": 5,
                 "instance": {
-                    "provider": "aws",
-                    "instance_type": "ml.g4dn.4xlarge",
+                    "provider": "ovh",
+                    "instance_type": "p3",
                     "max_runtime_seconds": 172800,
                     "num_instances": 1,
                     "disk_size_gb": 150,
@@ -81,34 +85,58 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
         project_json_resp = http_post(
             path="/projects/create", payload=payload, token=AUTOTRAIN_TOKEN, domain=AUTOTRAIN_BACKEND_API
         ).json()
-        typer.echo(f"Project creation: {project_json_resp}")
+        typer.echo("🎨🎨🎨 Project creation 🎨🎨🎨")
+        typer.echo(project_json_resp)
 
-        # Upload data
-        payload = {
-            "split": 4,
-            "col_mapping": project_config["col_mapping"],
-            "load_config": {"max_size_bytes": 0, "shuffle": False},
-        }
-        data_json_resp = http_post(
-            path=f"/projects/{project_json_resp['id']}/data/{project_config['dataset_name']}",
-            payload=payload,
-            token=AUTOTRAIN_TOKEN,
-            domain=AUTOTRAIN_BACKEND_API,
-            params={
-                "type": "dataset",
-                "config_name": project_config["dataset_config"],
-                "split_name": project_config["dataset_split"],
-            },
-        ).json()
-        typer.echo(f"Dataset creation: {data_json_resp}")
+        if project_json_resp["created"]:
+            data_payload = {
+                "split": 4,  # use "auto" split choice in AutoTrain
+                "col_mapping": project_config["col_mapping"],
+                "load_config": {"max_size_bytes": 0, "shuffle": False},
+                "dataset_id": project_config["dataset_name"],
+                "dataset_config": project_config["dataset_config"],
+                "dataset_split": project_config["dataset_split"],
+            }
+            data_json_resp = http_post(
+                path=f"/projects/{project_json_resp['id']}/data/dataset",
+                payload=data_payload,
+                token=AUTOTRAIN_TOKEN,
+                domain=AUTOTRAIN_BACKEND_API,
+            ).json()
+            typer.echo("💾💾💾 Dataset creation 💾💾💾")
+            typer.echo(data_json_resp)
 
-        # Run training
-        train_json_resp = http_get(
-            path=f"/projects/{project_json_resp['id']}/data/start_process",
-            token=AUTOTRAIN_TOKEN,
-            domain=AUTOTRAIN_BACKEND_API,
-        ).json()
-        typer.echo(f"Training job response: {train_json_resp}")
+            # Process data
+            data_proc_json_resp = http_post(
+                path=f"/projects/{project_json_resp['id']}/data/start_processing",
+                token=AUTOTRAIN_TOKEN,
+                domain=AUTOTRAIN_BACKEND_API,
+            ).json()
+            typer.echo(f"🍪 Start data processing response: {data_proc_json_resp}")
+
+            typer.echo("⏳ Waiting for data processing to complete ...")
+            is_data_processing_success = False
+            while is_data_processing_success is not True:
+                project_status = http_get(
+                    path=f"/projects/{project_json_resp['id']}",
+                    token=AUTOTRAIN_TOKEN,
+                    domain=AUTOTRAIN_BACKEND_API,
+                ).json()
+                # See database.database.enums.ProjectStatus for definitions of `status`
+                if project_status["status"] == 3:
+                    is_data_processing_success = True
+                    print("✅ Data processing complete!")
+                time.sleep(10)
+                typer.echo("🥱 Dataset not ready, waiting 10 more seconds ...")
+
+            # Approve training job
+            train_job_resp = http_post(
+                path=f"/projects/{project_json_resp['id']}/start_training",
+                token=AUTOTRAIN_TOKEN,
+                domain=AUTOTRAIN_BACKEND_API,
+            ).json()
+            print(f"🏃 Training job approval response: {train_job_resp}")
+            print("🔥 Project and dataset preparation completed!")
 
 
 if __name__ == "__main__":
