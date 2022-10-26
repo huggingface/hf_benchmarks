@@ -23,6 +23,6 @@ jobs:
 
       - name: Execute scoring script
         env:
-          HF_TOKEN: ${{ secrets.HF_GEM_TOKEN }}
+          HF_GEM_TOKEN: ${{ secrets.HF_GEM_TOKEN }}
         run: |
-          HF_TOKEN=$HF_TOKEN python scripts/run_gem_scoring.py
+          HF_GEM_TOKEN=$HF_GEM_TOKEN python scripts/run_gem_scoring.py

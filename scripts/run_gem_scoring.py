@@ -22,7 +22,7 @@ from hf_benchmarks import (
 if Path(".env").is_file():
     load_dotenv(".env")
 
-auth_token = os.getenv("HF_TOKEN")
+auth_token = os.getenv("HF_GEM_TOKEN")
 header = {"Authorization": "Bearer " + auth_token}
 
 SCORES_REPO_URL = "https://huggingface.co/datasets/GEM-submissions/submission-scores"
