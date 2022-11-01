@@ -29,7 +29,7 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     )
     eval_df = pd.read_csv(eval_fname)
 
-    submission_filename = f"submissions/{submission_dataset}.csv"
+    submission_filename = f"submissions/{user_id}-{submission_dataset}.csv"
     sub_fname = hf_hub_download(
         repo_id=evaluation_dataset,
         filename=submission_filename,
