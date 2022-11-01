@@ -1,6 +1,6 @@
-import pandas as pd
+import pandas as pd  # type: ignore
 from huggingface_hub import hf_hub_download  # type: ignore
-from sklearn import metrics
+from sklearn import metrics  # type: ignore
 
 
 def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_token: str, **kwargs):
@@ -29,9 +29,10 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     )
     eval_df = pd.read_csv(eval_fname)
 
+    submission_filename = f"submissions/{submission_dataset}.csv"
     sub_fname = hf_hub_download(
-        repo_id=submission_dataset,
-        filename=f"submissions/{user_id}.csv",
+        repo_id=evaluation_dataset,
+        filename=submission_filename,
         use_auth_token=use_auth_token,
         repo_type="dataset",
     )
