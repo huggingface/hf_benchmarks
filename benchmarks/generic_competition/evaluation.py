@@ -1,5 +1,5 @@
 import pandas as pd
-from huggingface_hub import hf_hub_download
+from huggingface_hub import hf_hub_download  # type: ignore
 from sklearn import metrics
 
 
@@ -16,7 +16,8 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     """
 
     user_id = kwargs.get("user_id", None)
-    assert user_id is not None
+    if user_id is None:
+        raise ValueError("user_id is required")
 
     metric = kwargs.get("metric", "accuracy_score")
 
