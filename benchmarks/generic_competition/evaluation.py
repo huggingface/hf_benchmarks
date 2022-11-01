@@ -18,6 +18,9 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     user_id = kwargs.get("user_id", None)
     if user_id is None:
         raise ValueError("user_id is required")
+    submission_id = kwargs.get("submission_id", None)
+    if submission_id is None:
+        raise ValueError("submission_id is required")
 
     metric = kwargs.get("metric", "accuracy_score")
 
@@ -29,9 +32,9 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     )
     eval_df = pd.read_csv(eval_fname)
 
-    submission_filename = f"submissions/{user_id}-{submission_dataset}.csv"
+    submission_filename = f"submissions/{user_id}-{submission_id}.csv"
     sub_fname = hf_hub_download(
-        repo_id=evaluation_dataset,
+        repo_id=submission_dataset,
         filename=submission_filename,
         use_auth_token=use_auth_token,
         repo_type="dataset",
