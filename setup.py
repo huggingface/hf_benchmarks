@@ -62,6 +62,7 @@ REQUIRED_PKGS = [
     "python-dotenv>=0.18.0",
     "evaluate==0.1.2",
     "scikit-learn==1.1.1",
+    "huggingface-hub==0.10.1",
 ]
 
 QUALITY_REQUIRE = ["black", "flake8", "isort", "pyyaml>=5.3.1", "mypy", "types-requests"]

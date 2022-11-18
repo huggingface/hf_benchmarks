@@ -51,6 +51,7 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
         # Define AutoTrain payload
         project_config = {}
         # Need a dummy dataset to use the dataset loader in AutoTrain
+        # Derived from the `emotion` dataset => multiclass classification task
         project_config["dataset_name"] = "autoevaluator/benchmark-dummy-data"
         project_config["dataset_config"] = "autoevaluator--benchmark-dummy-data"
         project_config["dataset_split"] = "train"
@@ -64,7 +65,7 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
         payload = {
             "username": AUTOTRAIN_USERNAME,
             "proj_name": submission_id,
-            "task": 1,
+            "task": 2,  # Need multi-class classification task to align with dummy dataset
             "config": {
                 "language": "en",
                 "max_models": 5,
