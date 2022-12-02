@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd  # type: ignore
 from huggingface_hub import hf_hub_download  # type: ignore
 from sklearn import metrics  # type: ignore
@@ -22,14 +24,26 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     if submission_id is None:
         raise ValueError("submission_id is required")
 
-    metric = kwargs.get("metric", "accuracy_score")
-
     eval_fname = hf_hub_download(
         repo_id=evaluation_dataset,
         filename="solution.csv",
         use_auth_token=use_auth_token,
         repo_type="dataset",
     )
+    # download conf
+    conf_fname = hf_hub_download(
+        repo_id=evaluation_dataset,
+        filename="conf.json",
+        use_auth_token=use_auth_token,
+        repo_type="dataset",
+    )
+
+    # read conf json
+    with open(conf_fname, "r") as f:
+        conf = json.load(f)
+
+    metric = conf["EVAL_METRIC"]
+
     eval_df = pd.read_csv(eval_fname)
 
     submission_filename = f"submissions/{user_id}-{submission_id}.csv"
