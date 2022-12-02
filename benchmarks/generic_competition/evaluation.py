@@ -33,7 +33,7 @@ def compute_metrics(evaluation_dataset: str, submission_dataset: str, use_auth_t
     # download conf
     conf_fname = hf_hub_download(
         repo_id=evaluation_dataset,
-        filename="conf",
+        filename="conf.json",
         use_auth_token=use_auth_token,
         repo_type="dataset",
     )
