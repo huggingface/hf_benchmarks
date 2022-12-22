@@ -1,6 +1,5 @@
 BOGUS_BENCHMARK_NAME = "bogus"
 DUMMY_BENCHMARK_NAME = "dummy"
 DUMMY_EVALUATION_ID = "lewtun/benchmarks-dummy-evaluation"
-DUMMY_MODEL_ID = "lewtun/benchmarks-dummy-model"
 DUMMY_PRIVATE_LABELS_ID = "lewtun/benchmarks-dummy-private-labels"
 DUMMY_SUBMISSION_ID = "lewtun/benchmarks-dummy-submission"

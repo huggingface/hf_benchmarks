@@ -3,7 +3,7 @@ from typing import Dict, List, Union
 import pandas as pd
 import requests
 import typer
-from huggingface_hub import HfApi, HfFolder
+from huggingface_hub import HfApi, list_datasets
 
 
 def delete_repos(repository_ids: List[str], auth_token: str, repo_type: str = "dataset") -> None:
@@ -49,7 +49,6 @@ def extract_tags(repo_info: Dict) -> Dict:
 def get_benchmark_repos(
     benchmark: str,
     use_auth_token: Union[bool, str, None] = None,
-    endpoint: str = "datasets",
     repo_type: str = "prediction",
     start_date: Union[str, pd.Timestamp] = None,
     end_date: Union[str, pd.Timestamp] = None,
@@ -59,7 +58,6 @@ def get_benchmark_repos(
     Args:
         benchmark: The benchmark name.
         auth_token: The authentication token for the Hugging Face Hub
-        endpoint: The endpoint to query. Can be `datasets` or `models`.
         repo_type: The type of benchmark repository. Can be `prediction`, `model` or `evaluation`.
         start_date: The timestamp for the start of the submission window.
         end_date: The timestamp for the end of the submission window.
@@ -67,35 +65,26 @@ def get_benchmark_repos(
     Returns:
         The benchmark repositories' metadata of a given `repo_type`.
     """
-    if isinstance(use_auth_token, str):
-        headers = {"Authorization": f"Bearer {use_auth_token}"}
-    elif use_auth_token:
-        token = HfFolder.get_token()
-        if token is None:
-            raise EnvironmentError("You specified use_auth_token=True, but a huggingface token was not found.")
-        headers = {"Authorization": f"Bearer {token}"}
-    # Fetch all metadata to access lastModified etc
-    params = {"full": True}
-    response = requests.get(f"http://huggingface.co/api/{endpoint}/", headers=headers, params=params)
-    response.raise_for_status()
-    repos = response.json()
-    submissions = []
+    submissions_to_evaluate = []
+    submissions = list_datasets(filter=f"benchmark:{benchmark}", full=True, use_auth_token=use_auth_token)
 
     # Filter for repos that fall within submission window
     if start_date and end_date:
-        repos = [repo for repo in repos if is_time_between(start_date, end_date, repo.get("lastModified"))]
+        submissions = [
+            submission for submission in submissions if is_time_between(start_date, end_date, submission.lastModified)
+        ]
 
-    for repo in repos:
-        tags = extract_tags(repo)
+    for submission in submissions:
         # Filter submission templates which have the submission_name="none" default value
+        card_data = submission.cardData
         if (
-            tags.get("benchmark") == benchmark
-            and tags.get("submission_name") != "none"
-            and tags.get("type") == repo_type
+            card_data.get("benchmark") == benchmark
+            and card_data.get("submission_name") != "none"
+            and card_data.get("type") == repo_type
         ):
-            submissions.append(repo)
+            submissions_to_evaluate.append(submission)
 
-    return submissions
+    return submissions_to_evaluate
 
 
 def download_submissions(header):

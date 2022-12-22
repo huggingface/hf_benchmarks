@@ -3,11 +3,10 @@ import time
 from pathlib import Path
 
 import pandas as pd
-import requests
 import typer
 from dotenv import load_dotenv
 
-from hf_benchmarks import extract_tags, get_benchmark_repos, http_get, http_post
+from hf_benchmarks import get_benchmark_repos, http_get, http_post
 
 
 if Path(".env").is_file():
@@ -27,27 +26,20 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
     typer.echo(f"Evaluating submissions on benchmark {benchmark} from {start_date} to {end_date}")
     submissions = get_benchmark_repos(benchmark, use_auth_token=HF_TOKEN, start_date=start_date, end_date=end_date)
     typer.echo(f"Found {len(submissions)} submissions to evaluate on benchmark {benchmark}")
-    header = {"Authorization": f"Bearer {HF_TOKEN}"}
     for submission in submissions:
-        submission_dataset = submission["id"]
+        submission_dataset = submission.id
         typer.echo(f"Evaluating submission {submission_dataset}")
-        response = requests.get(
-            f"http://huggingface.co/api/datasets/{submission_dataset}?full=true",
-            headers=header,
-        )
-        data = response.json()
-        # Extract submission name from YAML tags
-        tags = extract_tags(data)
+        card_data = submission.cardData
         # Format submission name to comply with AutoTrain API
         # _XXX_ for spaces, _DDD_ for double dashes
         # TODO: remove these dirty hacks - should really apply validation at submission time!
-        submission_name = tags["submission_name"].replace(" ", "_XXX_")
+        submission_name = card_data.get("submission_name").replace(" ", "_XXX_")
         submission_name = submission_name.replace("--", "_DDD_")
         # Extract submission timestamp and convert to Unix epoch in nanoseconds
-        timestamp = pd.to_datetime(data["lastModified"])
+        timestamp = pd.to_datetime(submission.lastModified)
         submission_timestamp = int(timestamp.tz_localize(None).timestamp())
         # Use the user-generated submission name, Git commit SHA and timestamp to create submission ID
-        submission_id = submission_name + "__" + data["sha"][:6] + "__" + str(submission_timestamp)
+        submission_id = submission_name + "__" + submission.sha[:6] + "__" + str(submission_timestamp)
         # Define AutoTrain payload
         project_config = {}
         # Need a dummy dataset to use the dataset loader in AutoTrain
