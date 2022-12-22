@@ -4,36 +4,9 @@ from unittest import TestCase
 import pandas as pd
 from huggingface_hub import HfFolder
 
-from hf_benchmarks import extract_tags, get_benchmark_repos
+from hf_benchmarks import get_benchmark_repos
 
 from .testing_utils import BOGUS_BENCHMARK_NAME, DUMMY_BENCHMARK_NAME, DUMMY_EVALUATION_ID, DUMMY_SUBMISSION_ID
-
-
-class ExtractTagsTest(TestCase):
-    def test_no_tags(self):
-        repo_info = {"modelId": "bert-base-uncased"}
-        tags = extract_tags(repo_info)
-        self.assertDictEqual(tags, {})
-
-    def test_no_keyed_tags(self):
-        repo_info = {"modelId": "bert-base-uncased", "tags": ["exbert"]}
-        tags = extract_tags(repo_info)
-        self.assertDictEqual(tags, {})
-
-    def test_keyed_tags(self):
-        repo_info = {"modelId": "bert-base-uncased", "tags": ["benchmark:glue", "dataset:wikipedia"]}
-        tags = extract_tags(repo_info)
-        self.assertDictEqual(tags, {"benchmark": "glue", "dataset": "wikipedia"})
-
-    def test_keyed_tags_with_multiple_colons(self):
-        repo_info = {"modelId": "bert-base-uncased", "tags": ["benchmark:glue:superglue", "dataset:wikipedia"]}
-        tags = extract_tags(repo_info)
-        self.assertDictEqual(tags, {"benchmark": "glue:superglue", "dataset": "wikipedia"})
-
-    def test_mixed_tags(self):
-        repo_info = {"modelId": "bert-base-uncased", "tags": ["exbert", "benchmark:glue", "dataset:wikipedia"]}
-        tags = extract_tags(repo_info)
-        self.assertDictEqual(tags, {"benchmark": "glue", "dataset": "wikipedia"})
 
 
 class GetBenchmarkReposTest(TestCase):

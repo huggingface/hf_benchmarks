@@ -26,26 +26,6 @@ def is_time_between(begin_time: str, end_time: str, check_time: str = None) -> b
         return check_time >= begin_time or check_time <= end_time
 
 
-def extract_tags(repo_info: Dict) -> Dict:
-    """Extracts the tags from a repository's metadata.
-
-    Args:
-        repo_info: The repository's metadata.
-
-    Returns:
-        The repository's tags.
-    """
-    tags = {}
-    repo_tags = repo_info.get("tags")
-    if repo_tags:
-        for repo_tag in repo_tags:
-            # Restrict splitting to the first ":" in case the value also contains a ":"
-            split_tags = repo_tag.split(":", maxsplit=1)
-            if len(split_tags) == 2:
-                tags[split_tags[0]] = split_tags[1]
-    return tags
-
-
 def get_benchmark_repos(
     benchmark: str,
     use_auth_token: Union[bool, str, None] = None,
@@ -87,28 +67,10 @@ def get_benchmark_repos(
     return submissions_to_evaluate
 
 
-def download_submissions(header):
-    response = requests.get("http://huggingface.co/api/datasets", headers=header)
-    all_datasets = response.json()
-    submissions = []
-
-    for dataset in all_datasets:
-        tags = extract_tags(dataset)
-        if tags.get("benchmark") == "gem" and tags.get("type") == "evaluation":
-            submissions.append(dataset)
-    return submissions
-
-
-def format_submissions(submissions, header):
+def get_model_index(submissions):
     all_scores = []
-    for idx, submission in enumerate(submissions):
-        submission_id = submission["id"]
-        response = requests.get(
-            f"http://huggingface.co/api/datasets/{submission_id}?full=true",
-            headers=header,
-        )
-        data = response.json()
-        card_data = data["cardData"]
+    for submission in submissions:
+        card_data = submission.cardData
         scores = card_data["model-index"][0]
         all_scores.append(scores)
     return all_scores

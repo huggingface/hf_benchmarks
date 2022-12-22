@@ -9,14 +9,7 @@ import typer
 from dotenv import load_dotenv
 from huggingface_hub import Repository, cached_download, hf_hub_url
 
-from hf_benchmarks import (
-    download_submissions,
-    extract_tags,
-    format_submissions,
-    get_benchmark_repos,
-    load_json,
-    save_json,
-)
+from hf_benchmarks import get_benchmark_repos, get_model_index, load_json, save_json
 
 
 if Path(".env").is_file():
@@ -87,9 +80,9 @@ def filter_submission_output(submission_scores: dict, config: dict):
 @app.command()
 def run():
     # Download submission metadata from the Hub
-    hub_submissions = download_submissions(header)
+    hub_submissions = get_benchmark_repos(benchmark="gem", repo_type="evaluation", use_auth_token=auth_token)
     # Filter out the test submissions
-    hub_submissions = [sub for sub in hub_submissions if "lewtun" not in sub["id"]]
+    hub_submissions = [sub for sub in hub_submissions if "lewtun" not in sub.id]
     # Download the submission from v1 of the GEM benchmark
     gem_v1_url = hf_hub_url(
         "GEM-submissions/v1-outputs-and-scores", filename="gem-v1-outputs-and-scores.zip", repo_type="dataset"
@@ -111,8 +104,8 @@ def run():
                     if "msttr" in kk and np.isnan(vv):
                         scores[k][kk] = -999
         gem_v1_scores.append(scores)
-    # Download scores from Hub and combine with v1 scores
-    all_scores = format_submissions(hub_submissions, header)
+    # Extract Hub scores and combine with v1 scores
+    all_scores = get_model_index(hub_submissions)
     all_scores.extend(gem_v1_scores)
     typer.echo(f"Number of raw scores: {len(all_scores)}")
     # Clone the Hub repo with the scores
@@ -152,9 +145,9 @@ def run():
     gem_v1_scores_files = [p for p in Path(LOCAL_GEM_V1_PATH).glob("*.scores.json")]
     gem_v1_outputs_files = [p for p in Path(LOCAL_GEM_V1_PATH).glob("*.outputs.json")]
 
-    hub_submissions = download_submissions(header)
-    hub_submissions = [sub for sub in hub_submissions if "lewtun" not in sub["id"]]
-    gem_v2_scores = format_submissions(hub_submissions, header)
+    hub_submissions = get_benchmark_repos(benchmark="gem", repo_type="evaluation", use_auth_token=auth_token)
+    hub_submissions = [sub for sub in hub_submissions if "lewtun" not in sub.id]
+    gem_v2_scores = get_model_index(hub_submissions)
     scores_submission_names = []
     gem_v2_scores_files = []
     for score in gem_v2_scores:
@@ -165,14 +158,14 @@ def run():
         save_json(filename, score)
 
     gem_v2_outputs = get_benchmark_repos("gem", use_auth_token=auth_token)
-    gem_v2_outputs = [s for s in gem_v2_outputs if "lewtun" not in s["id"]]
+    gem_v2_outputs = [s for s in gem_v2_outputs if "lewtun" not in s.id]
     gem_v2_outputs_files = []
 
     for submission in gem_v2_outputs:
-        tags = extract_tags(submission)
-        submission_name = tags["submission_name"]
+        card_data = submission.cardData
+        submission_name = card_data["submission_name"]
         if submission_name in scores_submission_names:
-            url = hf_hub_url(submission["id"], "submission.json", repo_type="dataset")
+            url = hf_hub_url(submission.id, "submission.json", repo_type="dataset")
             cache_filepath = cached_download(
                 url, cache_dir="data/tmp/", force_filename=f"{submission_name}.outputs.json"
             )
