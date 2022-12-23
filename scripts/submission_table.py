@@ -12,7 +12,6 @@ app = typer.Typer()
 @app.command()
 def run(
     benchmark: str,
-    endpoint: str = "datasets",
     repo_type: str = "prediction",
     start_date: str = None,
     end_date: str = None,
@@ -30,7 +29,6 @@ def run(
     submissions = get_benchmark_repos(
         benchmark=benchmark,
         use_auth_token=True,
-        endpoint=endpoint,
         repo_type=repo_type,
         start_date=start_date,
         end_date=end_date,

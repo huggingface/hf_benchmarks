@@ -3,7 +3,7 @@ from typing import Dict, List, Union
 import pandas as pd
 import requests
 import typer
-from huggingface_hub import HfApi, HfFolder
+from huggingface_hub import HfApi, list_datasets
 
 
 def delete_repos(repository_ids: List[str], auth_token: str, repo_type: str = "dataset") -> None:
@@ -26,30 +26,9 @@ def is_time_between(begin_time: str, end_time: str, check_time: str = None) -> b
         return check_time >= begin_time or check_time <= end_time
 
 
-def extract_tags(repo_info: Dict) -> Dict:
-    """Extracts the tags from a repository's metadata.
-
-    Args:
-        repo_info: The repository's metadata.
-
-    Returns:
-        The repository's tags.
-    """
-    tags = {}
-    repo_tags = repo_info.get("tags")
-    if repo_tags:
-        for repo_tag in repo_tags:
-            # Restrict splitting to the first ":" in case the value also contains a ":"
-            split_tags = repo_tag.split(":", maxsplit=1)
-            if len(split_tags) == 2:
-                tags[split_tags[0]] = split_tags[1]
-    return tags
-
-
 def get_benchmark_repos(
     benchmark: str,
     use_auth_token: Union[bool, str, None] = None,
-    endpoint: str = "datasets",
     repo_type: str = "prediction",
     start_date: Union[str, pd.Timestamp] = None,
     end_date: Union[str, pd.Timestamp] = None,
@@ -59,7 +38,6 @@ def get_benchmark_repos(
     Args:
         benchmark: The benchmark name.
         auth_token: The authentication token for the Hugging Face Hub
-        endpoint: The endpoint to query. Can be `datasets` or `models`.
         repo_type: The type of benchmark repository. Can be `prediction`, `model` or `evaluation`.
         start_date: The timestamp for the start of the submission window.
         end_date: The timestamp for the end of the submission window.
@@ -67,59 +45,32 @@ def get_benchmark_repos(
     Returns:
         The benchmark repositories' metadata of a given `repo_type`.
     """
-    if isinstance(use_auth_token, str):
-        headers = {"Authorization": f"Bearer {use_auth_token}"}
-    elif use_auth_token:
-        token = HfFolder.get_token()
-        if token is None:
-            raise EnvironmentError("You specified use_auth_token=True, but a huggingface token was not found.")
-        headers = {"Authorization": f"Bearer {token}"}
-    # Fetch all metadata to access lastModified etc
-    params = {"full": True}
-    response = requests.get(f"http://huggingface.co/api/{endpoint}/", headers=headers, params=params)
-    response.raise_for_status()
-    repos = response.json()
-    submissions = []
+    submissions_to_evaluate = []
+    submissions = list_datasets(filter=f"benchmark:{benchmark}", full=True, use_auth_token=use_auth_token)
 
     # Filter for repos that fall within submission window
     if start_date and end_date:
-        repos = [repo for repo in repos if is_time_between(start_date, end_date, repo.get("lastModified"))]
+        submissions = [
+            submission for submission in submissions if is_time_between(start_date, end_date, submission.lastModified)
+        ]
 
-    for repo in repos:
-        tags = extract_tags(repo)
+    for submission in submissions:
         # Filter submission templates which have the submission_name="none" default value
+        card_data = submission.cardData
         if (
-            tags.get("benchmark") == benchmark
-            and tags.get("submission_name") != "none"
-            and tags.get("type") == repo_type
+            card_data.get("benchmark") == benchmark
+            and card_data.get("submission_name") != "none"
+            and card_data.get("type") == repo_type
         ):
-            submissions.append(repo)
+            submissions_to_evaluate.append(submission)
 
-    return submissions
-
-
-def download_submissions(header):
-    response = requests.get("http://huggingface.co/api/datasets", headers=header)
-    all_datasets = response.json()
-    submissions = []
-
-    for dataset in all_datasets:
-        tags = extract_tags(dataset)
-        if tags.get("benchmark") == "gem" and tags.get("type") == "evaluation":
-            submissions.append(dataset)
-    return submissions
+    return submissions_to_evaluate
 
 
-def format_submissions(submissions, header):
+def get_model_index(submissions):
     all_scores = []
-    for idx, submission in enumerate(submissions):
-        submission_id = submission["id"]
-        response = requests.get(
-            f"http://huggingface.co/api/datasets/{submission_id}?full=true",
-            headers=header,
-        )
-        data = response.json()
-        card_data = data["cardData"]
+    for submission in submissions:
+        card_data = submission.cardData
         scores = card_data["model-index"][0]
         all_scores.append(scores)
     return all_scores
