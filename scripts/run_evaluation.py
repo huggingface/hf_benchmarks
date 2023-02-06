@@ -26,6 +26,7 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
     typer.echo(f"Evaluating submissions on benchmark {benchmark} from {start_date} to {end_date}")
     submissions = get_benchmark_repos(benchmark, use_auth_token=HF_TOKEN, start_date=start_date, end_date=end_date)
     typer.echo(f"Found {len(submissions)} submissions to evaluate on benchmark {benchmark}")
+    typer.echo(f"Submissions: {[submission.id for submission in submissions]}")
     for submission in submissions:
         submission_dataset = submission.id
         typer.echo(f"Evaluating submission {submission_dataset}")
@@ -34,6 +35,7 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
         # _XXX_ for spaces, _DDD_ for double dashes
         # TODO: remove these dirty hacks - should really apply validation at submission time!
         submission_name = card_data.get("submission_name").replace(" ", "_XXX_")
+        submission_name = submission_name.replace("+", "_XXX_")
         submission_name = submission_name.replace("--", "_DDD_")
         # Extract submission timestamp and convert to Unix epoch in nanoseconds
         timestamp = pd.to_datetime(submission.lastModified)
