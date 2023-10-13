@@ -1,6 +1,7 @@
 name: Run RAFT evaluation
 
 on:
+  workflow_dispatch:
   schedule:
     - cron:  '0 0 * * SUN' # Run evaluation at midnight every Sunday
 

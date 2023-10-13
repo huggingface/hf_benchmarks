@@ -25,7 +25,7 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
     start_date = pd.to_datetime(end_date) - pd.Timedelta(days=previous_days)
     typer.echo(f"Evaluating submissions on benchmark {benchmark} from {start_date} to {end_date}")
     submissions = get_benchmark_repos(benchmark, use_auth_token=HF_TOKEN, start_date=start_date, end_date=end_date)
-    typer.echo(f"Found {len(submissions)} submissions to evaluate on benchmark {benchmark}")
+    typer.echo(f"Found {len(submissions)} submissions to evaluate on benchmark {benchmark}: {[s.id for s in submissions]}")
     for submission in submissions:
         submission_dataset = submission.id
         typer.echo(f"Evaluating submission {submission_dataset}")
@@ -119,8 +119,10 @@ def run(benchmark: str, evaluation_dataset: str, end_date: str, previous_days: i
                 if project_status["status"] == 3:
                     is_data_processing_success = True
                     print("✅ Data processing complete!")
-                time.sleep(10)
-                typer.echo("🥱 Dataset not ready, waiting 10 more seconds ...")
+                    time.sleep(3)
+                else:
+                    time.sleep(10)
+                    typer.echo("🥱 Dataset not ready, waiting 10 more seconds ...")
 
             # Approve training job
             train_job_resp = http_post(
