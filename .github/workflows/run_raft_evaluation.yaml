@@ -34,9 +34,7 @@ jobs:
           YEAR: "${{ steps.current-time.outputs.year }}"
           MONTH: "${{ steps.current-time.outputs.month }}"
           DAY: "${{ steps.current-time.outputs.day }}"
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          AUTOTRAIN_USERNAME : ${{ secrets.AUTOTRAIN_USERNAME }}
-          AUTOTRAIN_TOKEN: ${{ secrets.AUTOTRAIN_TOKEN }}
-          AUTOTRAIN_BACKEND_API: ${{ secrets.AUTOTRAIN_BACKEND_API }}
+          HF_READ_TOKEN: ${{ secrets.HF_READ_TOKEN }}
+          HF_WRITE_TOKEN: ${{ secrets.HF_WRITE_TOKEN }}
         run: |
-          HF_TOKEN=$HF_TOKEN AUTOTRAIN_USERNAME=$AUTOTRAIN_USERNAME AUTOTRAIN_TOKEN=$AUTOTRAIN_TOKEN AUTOTRAIN_BACKEND_API=$AUTOTRAIN_BACKEND_API python scripts/run_evaluation.py raft ought/raft-private-labels $YEAR-$MONTH-$DAY 7
+          HF_READ_TOKEN=$HF_READ_TOKEN HF_WRITE_TOKEN=$HF_WRITE_TOKEN python scripts/run_raft.py $YEAR-$MONTH-$DAY 7
