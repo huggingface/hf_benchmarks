@@ -1,8 +1,9 @@
 name: Update GEM scores
 
 on:
-  schedule:
-    - cron:  '0 * * * *' # Update score every hour
+  workflow_dispatch: 
+  # schedule:
+  #   - cron:  '0 * * * *' # Update score every hour
 
 jobs:
 
